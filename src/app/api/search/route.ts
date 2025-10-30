@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     }))
     
     // Filter products based on search criteria
-    let filteredProducts = allProducts.filter(product => {
+    const filteredProducts = allProducts.filter(product => {
       // Text search
       const matchesQuery = !validatedParams.query || 
         product.name.toLowerCase().includes(validatedParams.query.toLowerCase()) ||

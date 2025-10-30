@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Search, Filter, Star, Eye as ContactIcon, Droplets } from 'lucide-react'
+import { Search, Filter, Star, Droplets } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -16,7 +16,26 @@ export default function ContactLensesPage() {
   const [selectedType, setSelectedType] = useState('all')
   const [selectedUsage, setSelectedUsage] = useState('all')
   const [sortBy, setSortBy] = useState('featured')
-  const [contactLenses, setContactLenses] = useState<any[]>([])
+  type ContactLens = {
+    id: number;
+    name: string;
+    brand: string;
+    price: number;
+    originalPrice?: number;
+    discount?: number;
+    rating: number;
+    reviews: number;
+    image: string;
+    type: string;
+    usage: string;
+    baseCurve: number;
+    diameter: number;
+    description: string;
+    inStock: boolean;
+    category: string;
+    color?: string;
+  };
+  const [contactLenses, setContactLenses] = useState<ContactLens[]>([])
   const [loading, setLoading] = useState(true)
   const { addToCart } = useCart()
   const { addToFavorites, isFavorite } = useFavorites()
@@ -166,13 +185,15 @@ export default function ContactLensesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredContactLenses.map((lens: any) => (
+            {filteredContactLenses.map((lens: ContactLens) => (
               <Card key={lens.id} className="group hover:shadow-lg transition-all duration-300">
                 <CardContent className="p-0">
                   <div className="relative">
-                    <img
+                    <Image
                       src={lens.image}
                       alt={lens.name}
+                      width={300}
+                      height={192}
                       className="w-full h-48 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-300"
                     />
                     {lens.discount && (

@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Upload, FileText, Eye, CheckCircle, AlertCircle, Download, ArrowRight, Camera, FileImage } from 'lucide-react'
+import { Upload, FileText, Eye, CheckCircle, AlertCircle, ArrowRight, Camera, FileImage } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
 
 export default function PrescriptionPage() {
   const [formData, setFormData] = useState({
@@ -106,7 +106,7 @@ export default function PrescriptionPage() {
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Upload Your Prescription</h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Get the perfect glasses tailored to your prescription. Upload your eye test report and we'll do the rest.
+            Get the perfect glasses tailored to your prescription. Upload your eye test report and we&apos;ll do the rest.
           </p>
           <div className="flex justify-center gap-4 mt-6">
             <Badge className="bg-green-100 text-green-800 px-4 py-2">

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
 // Mock reviews data stored in memory (in a real application, this would come from a database)
-let mockReviews = [
+const mockReviews = [
   {
     id: 1,
     productId: 'cmhaweccl0000f8hab2345678', // This will be replaced with actual Product IDs
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest, { params }: { params: { productI
     }
     
     // Filter reviews by product ID
-    let reviews = mockReviews.filter(review => {
+    const reviews = mockReviews.filter(review => {
       // Check if review is for the specific product by ID
       const matchesProductId = review.productId === product.id;
       

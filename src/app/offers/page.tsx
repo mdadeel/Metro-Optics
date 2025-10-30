@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Search, Clock, Tag, Gift, Percent, Star, ShoppingCart, Heart, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
+import { Search, Clock, Tag, Gift, Percent, Star, ShoppingCart, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useStore } from '@/lib/store';
-import glassesData from '@/data/glasses.json';
 
 interface Offer {
   id: string;
@@ -151,7 +150,7 @@ const offers: Offer[] = [
 export default function OffersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const { addToCart, addToFavorites, removeFromFavorites, isFavorite } = useStore();
+
 
   const filteredOffers = useMemo(() => {
     return offers.filter(offer => {
@@ -170,7 +169,7 @@ export default function OffersPage() {
     try {
       await navigator.clipboard.writeText(code);
       // You could add a toast notification here
-    } catch (err) {
+    } catch {
       // Fallback for browsers that don't support clipboard API or permission denied
       const textArea = document.createElement('textarea');
       textArea.value = code;
@@ -283,9 +282,11 @@ export default function OffersPage() {
               {filteredOffers.filter(offer => offer.featured).map((offer) => (
                 <Card key={offer.id} className="group hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-emerald-200">
                   <div className="relative">
-                    <img
+                    <Image
                       src={offer.image}
                       alt={offer.title}
+                      width={400}
+                      height={192}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-4 left-4">
@@ -372,9 +373,11 @@ export default function OffersPage() {
               {filteredOffers.map((offer) => (
                 <Card key={offer.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
                   <div className="relative">
-                    <img
+                    <Image
                       src={offer.image}
                       alt={offer.title}
+                      width={300}
+                      height={160}
                       className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-3 left-3">

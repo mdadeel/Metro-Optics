@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
-import { User, ShoppingBag, Package, Heart, Settings, LogOut, Eye, MapPin, Phone, Mail, Calendar, CreditCard, Truck, Clock, CheckCircle, XCircle, AlertCircle, ChevronRight, Download, Filter, Search, Shield, Star, TrendingUp, Award, Camera, Calendar as CalendarIcon, Bell, Gift, Zap, Monitor } from 'lucide-react';
+import { User, Package, Heart, Settings, LogOut, Eye, MapPin, Phone, CreditCard, Truck, Clock, CheckCircle, XCircle, AlertCircle, ChevronRight, Download, Filter, Search, Shield, Star, TrendingUp, Award, Camera, Calendar as CalendarIcon, Bell, Gift, Zap, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/lib/auth-context';
@@ -21,7 +21,7 @@ export default function Dashboard() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedOrder, setSelectedOrder] = useState(null);
+
 
   const wishlist = [
     {
@@ -788,9 +788,11 @@ export default function Dashboard() {
                   {wishlist.map((item) => (
                     <Card key={item.id} className="overflow-hidden group">
                       <div className="relative">
-                        <img
+                        <Image
                           src={item.image}
                           alt={item.name}
+                          width={300}
+                          height={192}
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform"
                         />
                         {!item.inStock && (

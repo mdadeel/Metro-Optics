@@ -2,21 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import { useFeaturedProducts, useSearchProducts } from '@/hooks/use-products'
-import { Search, ShoppingCart, User, Menu, X, ChevronDown, Star, Truck, Shield, RefreshCw, Globe, CreditCard, ArrowRight, Sparkles, TrendingUp, Package, Eye, Glasses, MapPin, Phone, Mail, Sun, Eye as ContactIcon, Baby, CheckCircle } from 'lucide-react'
+import { Search, ShoppingCart, User, Menu, X, ChevronDown, Star, Truck, Shield, RefreshCw, ArrowRight, Sparkles, TrendingUp, Package, Eye, Glasses, MapPin, Phone, Mail, Sun, Eye as ContactIcon, Baby } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { useCart } from '@/lib/cart-context'
 import { useFavorites } from '@/lib/favorites-context'
 import { useAuth } from '@/lib/auth-context'
 import FeaturedProducts from '@/components/ui/featured-products'
 import { CategoryCardSkeleton, FeatureCardSkeleton } from '@/components/ui/skeleton-loader'
-import { ProductCardSkeleton, SearchLoading, EmptyStateWithLoading } from '@/components/ui/loading-states'
+import { EmptyStateWithLoading } from '@/components/ui/loading-states'
 import { getPlaceholderUrl } from '@/lib/image-generator'
-import { generateAriaLabel, handleKeyboardNavigation, announceToScreenReader } from '@/lib/accessibility'
+import { generateAriaLabel, handleKeyboardNavigation } from '@/lib/accessibility'
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -25,13 +23,13 @@ export default function HomePage() {
   const [showSearchResults, setShowSearchResults] = useState(false)
   const { cart } = useCart()
   const { favorites } = useFavorites()
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   
   // Use React Query for data fetching
-  const { data: products = [], isLoading: productsLoading, error: productsError } = useFeaturedProducts()
+  const { data: products = [], isLoading: productsLoading } = useFeaturedProducts()
   const { data: searchResults = [], isLoading: isSearching } = useSearchProducts(searchQuery, searchQuery.length > 2)
   
-  const [featuredCategories, setFeaturedCategories] = useState([])
+
   const [categoriesLoading, setCategoriesLoading] = useState(true)
   const [featuresLoading, setFeaturesLoading] = useState(true)
 
@@ -273,7 +271,7 @@ export default function HomePage() {
                       </div>
                     ) : searchResults.length > 0 ? (
                       <div className="py-2" role="presentation">
-                        {searchResults.map((product: any, index) => (
+                        {searchResults.map((product: { id: number; name: string; brand: string; price: number; originalPrice?: number; discount?: number; rating: number; reviews: number; image: string; description?: string; inStock: boolean; category: string }, index) => (
                           <div
                             key={product.id}
                             data-search-result={index}
@@ -974,7 +972,7 @@ export default function HomePage() {
                   <Sparkles className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-red-600 transition-colors">Today's Deals</h3>
+                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-red-600 transition-colors">Today&apos;s Deals</h3>
                   <p className="text-sm text-gray-600 mt-1">Limited time offers</p>
                 </div>
                 <div className="text-red-600 font-medium text-sm group-hover:text-red-700">
@@ -1062,7 +1060,7 @@ export default function HomePage() {
           <div className="text-center mb-8 sm:mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">Why Choose Metro Optics?</h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
-              Bangladesh's trusted optical shop with authentic international brands
+              Bangladesh&apos;s trusted optical shop with authentic international brands
             </p>
           </div>
           
@@ -1103,7 +1101,7 @@ export default function HomePage() {
               </div>
               
               <p className="text-gray-300 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base max-w-md">
-                Bangladesh's trusted optical destination. We bring you authentic international brands with professional eye care services, ensuring clarity and style for every vision.
+                Bangladesh&apos;s trusted optical destination. We bring you authentic international brands with professional eye care services, ensuring clarity and style for every vision.
               </p>
               
               {/* Contact Info */}
@@ -1198,10 +1196,10 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <div className="text-center md:text-left">
                 <p className="text-gray-400 text-sm">
-                  © 2024 Metro Optics. All rights reserved. | Bangladesh's Premier Optical Shop
+                  © 2024 Metro Optics. All rights reserved. | Bangladesh&apos;s Metro Optical Shop
                 </p>
                 <p className="text-gray-500 text-xs mt-1">
-                  Showroom: Dhanmondi, Dhaka | Operating: 10AM - 8PM Daily
+                  Showroom: Majhar Gate, Agrabad, Chittagong | Operating: 10AM - 8PM Daily
                 </p>
               </div>
               

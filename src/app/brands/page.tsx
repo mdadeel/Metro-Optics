@@ -5,25 +5,40 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, Star, ShoppingCart } from "lucide-react"
+import { Search, Star, ShoppingCart, Building } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
+type Product = {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  originalPrice?: number;
+  discount?: number;
+  rating: number;
+  reviews: number;
+  image: string;
+  description?: string;
+  inStock: boolean;
+  category: string;
+};
+
 export default function BrandsPage() {
-  const [products, setProducts] = useState<any[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [brands, setBrands] = useState<string[]>([])
   const [selectedBrand, setSelectedBrand] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([])
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
 
   useEffect(() => {
     async function fetchProducts() {
       try {
         const response = await fetch('/api/products')
         if (response.ok) {
-          const data = await response.json()
+          const data: Product[] = await response.json()
           setProducts(data)
-          const uniqueBrands = [...new Set(data.map((p: any) => p.brand).filter(Boolean))] as string[]
+          const uniqueBrands = [...new Set(data.map((p: Product) => p.brand).filter(Boolean))] as string[]
           setBrands(uniqueBrands)
         }
       } catch (error) {

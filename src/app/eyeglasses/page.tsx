@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Search, Filter, Star, Eye, Glasses } from 'lucide-react'
+import { Search, Filter, Star, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -16,7 +16,24 @@ export default function EyeglassesPage() {
   const [selectedFrame, setSelectedFrame] = useState('all')
   const [selectedMaterial, setSelectedMaterial] = useState('all')
   const [sortBy, setSortBy] = useState('featured')
-  const [eyeglasses, setEyeglasses] = useState<any[]>([])
+  type EyeglassesProduct = {
+    id: number;
+    name: string;
+    brand: string;
+    price: number;
+    originalPrice?: number;
+    discount?: number;
+    rating: number;
+    reviews: number;
+    image: string;
+    type: string;
+    description: string;
+    inStock: boolean;
+    category: string;
+    frameType?: string;
+    lensType?: string;
+  };
+  const [eyeglasses, setEyeglasses] = useState<EyeglassesProduct[]>([])
   const [loading, setLoading] = useState(true)
   const { addToCart } = useCart()
   const { addToFavorites, isFavorite } = useFavorites()
@@ -169,13 +186,15 @@ export default function EyeglassesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredEyeglasses.map((glasses: any) => (
+            {filteredEyeglasses.map((glasses: EyeglassesProduct) => (
               <Card key={glasses.id} className="group hover:shadow-lg transition-all duration-300">
                 <CardContent className="p-0">
                   <div className="relative">
-                    <img
+                    <Image
                       src={glasses.image}
                       alt={glasses.name}
+                      width={300}
+                      height={192}
                       className="w-full h-48 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-300"
                     />
                     {glasses.discount && (

@@ -10,18 +10,14 @@ import {
   MessageCircle, 
   Phone, 
   Mail, 
-  Clock, 
   HelpCircle, 
   ShoppingBag, 
-  CreditCard, 
   Truck, 
   RotateCcw,
   Shield,
-  Star,
   ChevronDown,
   ChevronRight
 } from 'lucide-react'
-import Link from 'next/link'
 
 const faqs = [
   {

@@ -1,20 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
-// Helper function to get sort options
-function getSortOption(sortBy: string | null) {
-  switch (sortBy) {
-    case 'price-low': return { price: 'asc' as const }
-    case 'price-high': return { price: 'desc' as const }
-    case 'rating': return { rating: 'desc' as const }
-    case 'name': return { name: 'asc' as const }
-    case 'reviews': return { reviews: 'desc' as const }
-    default: return [
-      { rating: 'desc' as const },
-      { reviews: 'desc' as const }
-    ]
-  }
-}
+
 
 export async function GET(
   request: NextRequest,

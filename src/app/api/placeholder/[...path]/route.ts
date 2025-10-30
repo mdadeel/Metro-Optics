@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPlaceholderUrl } from '@/lib/image-generator'
-import { parse } from 'url'
 
 export async function GET(request: NextRequest) {
   try {

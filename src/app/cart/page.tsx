@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
-import { ShoppingCart, Plus, Minus, Trash2, ArrowLeft, Shield, Truck, RefreshCw, CreditCard, ChevronRight, Check, Package, Star } from 'lucide-react'
+import { ShoppingCart, Plus, Minus, Trash2, ArrowLeft, Shield, Truck, RefreshCw, ChevronRight, Check, Package, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -129,9 +129,11 @@ export default function CartPage() {
               {recommendedProducts.map((product) => (
                 <Card key={product.id} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-4">
-                    <img
+                    <Image
                       src={product.image}
                       alt={product.name}
+                      width={200}
+                      height={128}
                       className="w-full h-32 object-cover rounded-lg mb-4"
                     />
                     <h4 className="font-medium text-gray-900 mb-2">{product.name}</h4>
@@ -235,9 +237,11 @@ export default function CartPage() {
                 <CardContent className="p-6">
                   <div className="flex gap-6">
                     <div className="relative">
-                      <img
+                      <Image
                         src={item.image}
                         alt={item.name}
+                        width={128}
+                        height={128}
                         className="w-32 h-32 object-cover rounded-lg"
                       />
                       {item.discount && (

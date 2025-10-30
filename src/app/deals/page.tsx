@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Search, Filter, Star, Clock, Tag, TrendingUp } from 'lucide-react'
+import { Search, Filter, Star, Clock, TrendingUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -15,7 +15,21 @@ export default function DealsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [sortBy, setSortBy] = useState('discount')
-  const [deals, setDeals] = useState<any[]>([])
+  type Deal = {
+    id: number;
+    name: string;
+    brand: string;
+    price: number;
+    originalPrice: number;
+    discount: number;
+    rating: number;
+    reviews: number;
+    image: string;
+    description?: string;
+    inStock: boolean;
+    category: string;
+  };
+  const [deals, setDeals] = useState<Deal[]>([])
   const [loading, setLoading] = useState(true)
   const { addToCart } = useCart()
   const { addToFavorites, isFavorite } = useFavorites()
@@ -147,13 +161,15 @@ export default function DealsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDeals.map((deal: any) => (
+            {filteredDeals.map((deal: Deal) => (
               <Card key={deal.id} className="group hover:shadow-lg transition-all duration-300">
                 <CardContent className="p-0">
                   <div className="relative">
-                    <img
+                    <Image
                       src={deal.image}
                       alt={deal.name}
+                      width={300}
+                      height={192}
                       className="w-full h-48 object-cover rounded-t-lg"
                     />
                     <div className="absolute top-2 left-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">

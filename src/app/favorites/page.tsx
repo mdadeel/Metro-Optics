@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, ArrowLeft, Heart, ShoppingBag, Star, Filter, Grid, List, TrendingUp, Package } from 'lucide-react'
+import Image from 'next/image'
+import { Search, ArrowLeft, Heart, ShoppingBag, Star, Grid, List, TrendingUp, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -18,6 +19,22 @@ export default function FavoritesPage() {
   const [sortBy, setSortBy] = useState('date')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   
+  type Product = {
+    id: number;
+    name: string;
+    brand: string;
+    price: number;
+    originalPrice?: number;
+    discount?: number;
+    rating: number;
+    reviews: number;
+    image: string;
+    category: string;
+    description?: string;
+    inStock: boolean;
+    [key: string]: unknown; // Allow additional properties
+  };
+
   const { favorites, addToFavorites, removeFromFavorites, isFavorite } = useFavorites()
   const { addToCart } = useCart()
 
@@ -48,11 +65,27 @@ export default function FavoritesPage() {
     }
   })
 
-  const handleAddToCart = (product: any) => {
+  type Product = {
+    id: number;
+    name: string;
+    brand: string;
+    price: number;
+    originalPrice?: number;
+    discount?: number;
+    rating: number;
+    reviews: number;
+    image: string;
+    category: string;
+    description?: string;
+    inStock: boolean;
+    [key: string]: unknown; // Allow additional properties
+  };
+
+  const handleAddToCart = (product: Product) => {
     addToCart(product)
   }
 
-  const handleToggleFavorite = (product: any) => {
+  const handleToggleFavorite = (product: Product) => {
     if (isFavorite(product.id)) {
       removeFromFavorites(product.id)
     } else {
@@ -325,9 +358,11 @@ export default function FavoritesPage() {
                   {viewMode === 'grid' ? (
                     <Link href={`/products/${product.id}`}>
                       <div className="relative">
-                        <img
+                        <Image
                           src={product.image}
                           alt={product.name}
+                          width={300}
+                          height={192}
                           className="w-full h-48 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-300"
                         />
                         {product.discount && (
@@ -401,9 +436,11 @@ export default function FavoritesPage() {
                     <CardContent className="p-6">
                       <div className="flex gap-6">
                         <Link href={`/products/${product.id}`}>
-                          <img
+                          <Image
                             src={product.image}
                             alt={product.name}
+                            width={128}
+                            height={128}
                             className="w-32 h-32 object-cover rounded-lg"
                           />
                         </Link>

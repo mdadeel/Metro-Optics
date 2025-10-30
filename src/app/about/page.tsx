@@ -234,9 +234,11 @@ export default function AboutPage() {
             ].map((member, index) => (
               <div key={index} className="text-center group">
                 <div className="relative mb-6">
-                  <img
+                  <Image
                     src={member.image}
                     alt={member.name}
+                    width={128}
+                    height={128}
                     className="w-32 h-32 rounded-full mx-auto object-cover ring-4 ring-emerald-100 group-hover:ring-emerald-200 transition-all duration-300"
                   />
                   <div className="absolute bottom-0 right-1/2 transform translate-x-1/2 translate-y-1/2 w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full flex items-center justify-center">

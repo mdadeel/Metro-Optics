@@ -121,7 +121,7 @@ export default function CategoriesPage() {
       {/* Categories Grid */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {categories.map((category, index) => (
+          {categories.map((category) => (
             <Card 
               key={category.id} 
               className="group hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border-0 shadow-lg overflow-hidden"

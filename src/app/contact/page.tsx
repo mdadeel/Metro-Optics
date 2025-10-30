@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -248,9 +249,11 @@ export default function ContactPage() {
               
               {/* Map Placeholder */}
               <div className="bg-gray-200 rounded-lg h-64 mb-6 relative overflow-hidden">
-                <img
+                <Image
                   src="https://images.unsplash.com/photo-1579532584939-d25bc1df9a6e?w=600&h=400&fit=crop&crop=center"
                   alt="Map"
+                  width={600}
+                  height={400}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/20 flex items-center justify-center">

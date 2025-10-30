@@ -1,17 +1,32 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, Star, ShoppingCart, Heart, Baby } from "lucide-react"
+import { Search, Star, ShoppingCart, Baby } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
+type KidsProduct = {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  originalPrice?: number;
+  discount?: number;
+  rating: number;
+  reviews: number;
+  image: string;
+  description?: string;
+  inStock: boolean;
+  category: string;
+};
+
 export default function KidsPage() {
-  const [products, setProducts] = useState<any[]>([])
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([])
+  const [products, setProducts] = useState<KidsProduct[]>([])
+  const [filteredProducts, setFilteredProducts] = useState<KidsProduct[]>([])
   const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
