@@ -39,6 +39,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         credentials: 'include'
       })
       if (!response.ok) {
+        if (response.status === 401) {
+          return null; // Not logged in, not an error
+        }
         throw new Error(`Auth check failed: ${response.status}`)
       }
       return response.json()

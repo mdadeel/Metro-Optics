@@ -74,14 +74,14 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <QueryProvider>
-            <CartProvider>
-              <FavoritesProvider>
-                <AuthProvider>
+            <AuthProvider>
+              <CartProvider>
+                <FavoritesProvider>
                   {children}
                   <Toaster />
-                </AuthProvider>
-              </FavoritesProvider>
-            </CartProvider>
+                </FavoritesProvider>
+              </CartProvider>
+            </AuthProvider>
           </QueryProvider>
         </ErrorBoundary>
       </body>

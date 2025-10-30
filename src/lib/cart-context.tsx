@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { handleApiError, safeApiCall } from '@/lib/error-handler'
+import { useAuth } from '@/lib/auth-context'
 
 interface CartItem {
   id: number
@@ -110,6 +111,8 @@ const initialState: CartState = {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, initialState)
 
+  const { user, loading: authLoading } = useAuth()
+
   // Load cart from API on mount
   useEffect(() => {
     const loadCart = async () => {
@@ -128,21 +131,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         dispatch({ type: 'LOAD_CART', payload: result.data })
       } else if (result.error) {
         console.error('Cart load error:', result.error)
-        // Fallback to localStorage for demo purposes
-        const savedCart = localStorage.getItem('cart')
-        if (savedCart) {
-          try {
-            const parsedCart = JSON.parse(savedCart)
-            dispatch({ type: 'LOAD_CART', payload: parsedCart })
-          } catch (parseError) {
-            console.error('Failed to parse saved cart:', parseError)
-          }
+      }
+    }
+
+    if (!authLoading && user) {
+      loadCart()
+    } else if (!authLoading && !user) {
+      // Not logged in, load from local storage
+      const savedCart = localStorage.getItem('cart')
+      if (savedCart) {
+        try {
+          const parsedCart = JSON.parse(savedCart)
+          dispatch({ type: 'LOAD_CART', payload: parsedCart })
+        } catch (parseError) {
+          console.error('Failed to parse saved cart:', parseError)
         }
       }
     }
-    
-    loadCart()
-  }, [])
+  }, [user, authLoading])
 
   // Save cart to localStorage whenever it changes (fallback)
   useEffect(() => {
