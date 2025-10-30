@@ -23,11 +23,10 @@ export default function AboutPage() {
                 {" "}OpticalBD
               </span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Your trusted partner for premium eyewear in Bangladesh. We're dedicated to bringing you 
-              the world's finest glasses and sunglasses with unmatched quality and service.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                          <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                            Your trusted partner for premium eyewear in Bangladesh. We&apos;re dedicated to bringing you 
+                            the world&apos;s finest glasses and sunglasses with unmatched quality and service.
+                          </p>            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105">
                 Shop Our Collection
               </Button>
