@@ -35,7 +35,7 @@ type CartAction =
 
 const CartContext = createContext<{
   state: CartState
-  addToCart: (product: any) => void
+  addToCart: (product: Omit<CartItem, 'quantity'>) => void
   removeFromCart: (id: number) => void
   updateQuantity: (id: number, quantity: number) => void
   clearCart: () => void
@@ -155,7 +155,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('cart', JSON.stringify(state.items))
   }, [state.items])
 
-  const addToCart = async (product: any) => {
+  const addToCart = async (product: Omit<CartItem, 'quantity'>) => {
     const result = await safeApiCall(async () => {
       const response = await fetch('/api/cart', {
         method: 'POST',

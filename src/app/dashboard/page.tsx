@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 import { User, ShoppingBag, Package, Heart, Settings, LogOut, Eye, MapPin, Phone, Mail, Calendar, CreditCard, Truck, Clock, CheckCircle, XCircle, AlertCircle, ChevronRight, Download, Filter, Search, Shield, Star, TrendingUp, Award, Camera, Calendar as CalendarIcon, Bell, Gift, Zap, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -291,13 +292,17 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 sm:gap-4">
-              <Link href="/">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <Eye className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
-                  </div>
-                  <h1 className="text-lg sm:text-xl font-bold text-gray-900">Metro Optics</h1>
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
+                  <Image 
+                    src="/logo.png" 
+                    alt="Metro Optics Logo"
+                    width={40}
+                    height={40}
+                    className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+                  />
                 </div>
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">Metro Optics</h1>
               </Link>
               <Separator orientation="vertical" className="h-4 sm:h-6 hidden sm:block" />
               <h2 className="text-sm sm:text-lg font-semibold text-gray-700 hidden sm:block">My Dashboard</h2>

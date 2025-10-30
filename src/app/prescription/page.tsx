@@ -79,7 +79,7 @@ export default function PrescriptionPage() {
                 <h3 className="font-semibold text-blue-900 mb-2">Next Steps:</h3>
                 <ul className="text-left text-blue-800 space-y-2">
                   <li>• Our optometrist will review your prescription</li>
-                  <li>• We'll call you to confirm the details</li>
+                  <li>• We&apos;ll call you to confirm the details</li>
                   <li>• Perfect frames will be recommended for you</li>
                   <li>• Your glasses will be ready in 3-5 working days</li>
                 </ul>
@@ -351,7 +351,7 @@ export default function PrescriptionPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>Include both eyes' prescription if on separate pages</span>
+                    <span>Include both eyes&apos; prescription if on separate pages</span>
                   </li>
                 </ul>
               </CardContent>
@@ -382,13 +382,13 @@ export default function PrescriptionPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Eye className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium">Doctor's signature and date</span>
+                    <span className="text-sm font-medium">Doctor&apos;s signature and date</span>
                   </div>
                 </div>
                 <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
                   <p className="text-xs text-yellow-800">
                     <AlertCircle className="h-3 w-3 inline mr-1" />
-                    Don't worry if any information is missing - our optometrist will help you complete it.
+                    Don&apos;t worry if any information is missing - our optometrist will help you complete it.
                   </p>
                 </div>
               </CardContent>

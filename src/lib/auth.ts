@@ -15,13 +15,25 @@ export async function comparePassword(password: string, hashedPassword: string):
   return await bcrypt.compare(password, hashedPassword)
 }
 
-export function generateToken(payload: any): string {
+type UserSession = {
+  id: number | string;
+  name: string;
+  email: string;
+  phone?: string;
+  avatar?: string;
+  memberSince?: string;
+  totalOrders?: number;
+  totalSpent?: number;
+  [key: string]: any; // Allow other properties
+};
+
+export function generateToken(payload: UserSession): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' })
 }
 
-export function verifyToken(token: string): any {
+export function verifyToken(token: string): UserSession | null {
   try {
-    return jwt.verify(token, JWT_SECRET)
+    return jwt.verify(token, JWT_SECRET) as UserSession
   } catch (error) {
     return null
   }

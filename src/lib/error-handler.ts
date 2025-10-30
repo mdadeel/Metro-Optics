@@ -4,14 +4,14 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
-    public data?: any
+    public data?: unknown
   ) {
     super(message)
     this.name = 'ApiError'
   }
 }
 
-export const handleApiError = (error: any): string => {
+export const handleApiError = (error: unknown): string => {
   if (error instanceof ApiError) {
     switch (error.status) {
       case 400:
@@ -42,7 +42,7 @@ export const handleApiError = (error: any): string => {
 
 export const safeApiCall = async <T>(
   apiCall: () => Promise<T>,
-  errorHandler?: (error: any) => string
+  errorHandler?: (error: unknown) => string
 ): Promise<{ data?: T; error?: string }> => {
   try {
     const data = await apiCall()
@@ -101,20 +101,27 @@ export const useApiCall = () => {
 }
 
 // Validation error handler
-export const handleValidationError = (error: any): string => {
-  if (error?.issues && Array.isArray(error.issues)) {
-    return error.issues.map((issue: any) => issue.message).join(', ')
+export const handleValidationError = (error: unknown): string => {
+  if (error && typeof error === 'object' && 'issues' in error && Array.isArray((error as any).issues)) {
+    return (error as any).issues.map((issue: unknown) => {
+      if (issue && typeof issue === 'object' && 'message' in issue) {
+        return (issue as { message: string }).message;
+      }
+      return 'Validation error';
+    }).join(', ');
   }
   return 'Validation failed. Please check your input.'
 }
 
 // Form error handler
-export const handleFormError = (error: any, fieldName?: string): string => {
-  if (error?.issues && Array.isArray(error.issues)) {
-    const fieldError = error.issues.find((issue: any) => 
-      issue.path.includes(fieldName)
-    )
-    return fieldError?.message || 'Invalid input'
+export const handleFormError = (error: unknown, fieldName?: string): string => {
+  if (error && typeof error === 'object' && 'issues' in error && Array.isArray((error as any).issues)) {
+    const fieldError = (error as any).issues.find((issue: unknown) => 
+      issue && typeof issue === 'object' && 'path' in issue && Array.isArray((issue as any).path) && (issue as any).path.includes(fieldName)
+    );
+    if (fieldError && typeof fieldError === 'object' && 'message' in fieldError) {
+      return (fieldError as { message: string }).message || 'Invalid input';
+    }
   }
-  return 'Please check this field'
+  return 'Please check this field';
 }

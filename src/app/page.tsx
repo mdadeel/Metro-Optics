@@ -152,17 +152,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top Announcement Bar - Enhanced Mobile */}
-      <div className="bg-blue-600 text-white py-2 px-3 sm:px-4 text-center overflow-hidden relative">
-        <div className="flex items-center justify-center animate-marquee">
-          <Sparkles className="h-3 w-3 mr-1 sm:mr-2 flex-shrink-0" />
-          <p className="text-xs sm:text-sm font-medium whitespace-nowrap">
-            <span className="hidden sm:inline">চশ্মা মেলা:</span>
-            <span className="sm:hidden">চশ্মা মেলা:</span> Up to 50% off + Free Delivery | Code: VISION2024
-          </p>
-        </div>
-      </div>
-
       {/* Header - Enhanced Mobile Navigation */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
@@ -185,8 +174,14 @@ export default function HomePage() {
 
             {/* Logo - Enhanced Mobile */}
             <Link href="/" className="flex items-center space-x-2 sm:space-x-3 flex-1 lg:flex-none justify-center lg:justify-start">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-                <Glasses className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
+                <Image 
+                  src="/logo.png" 
+                  alt="Metro Optics Logo"
+                  width={40}
+                  height={40}
+                  className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+                />
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Metro Optics</h1>
@@ -323,14 +318,14 @@ export default function HomePage() {
                             onClick={handleSearch}
                             className="text-blue-600 hover:text-blue-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset rounded"
                           >
-                            View all results for "{searchQuery}"
+                            View all results for &quot;{searchQuery}&quot;
                           </button>
                         </div>
                       </div>
                     ) : searchQuery.length > 2 ? (
                       <div className="p-6 text-center text-gray-500" role="status" aria-live="polite">
                         <Search className="w-12 h-12 mx-auto mb-4 opacity-50 text-gray-400" />
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2">No products found for "{searchQuery}"</h3>
+                        <h3 className="text-lg font-semibold text-gray-800 mb-2">No products found for &quot;{searchQuery}&quot;</h3>
                         <p className="text-sm text-gray-600">Try a different search term or browse our categories.</p>
                       </div>
                     ) : null}
@@ -729,17 +724,6 @@ export default function HomePage() {
                   <Link href="/products">
                     <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                     Shop Now
-                  </Link>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="border-2 border-white text-white hover:bg-white hover:text-black px-6 py-3 sm:px-8 sm:py-4 text-sm sm:text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 touch-manipulation"
-                  asChild
-                >
-                  <Link href="#featured">
-                    <Eye className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                    View Collection
                   </Link>
                 </Button>
               </div>

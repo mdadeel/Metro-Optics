@@ -276,7 +276,7 @@ export default function OffersPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Featured Deals</h2>
-              <p className="text-gray-600">Don't miss out on these limited-time offers</p>
+              <p className="text-gray-600">Don&apos;t miss out on these limited-time offers</p>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">

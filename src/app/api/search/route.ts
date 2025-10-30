@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
       category: searchParams.get('category') || undefined,
       minPrice: searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined,
       maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,
-      sortBy: searchParams.get('sortBy') as any || undefined,
-      sortOrder: searchParams.get('sortOrder') as any || undefined,
+      sortBy: searchParams.get('sortBy') || undefined,
+      sortOrder: searchParams.get('sortOrder') || undefined,
       page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
       limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : 12
     }
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     const validatedParams = searchSchema.parse(params)
     
     // Use the same product data as the main API
-    let allProducts = glassesData.products.map(product => ({
+    const allProducts = glassesData.products.map(product => ({
       ...product,
       slug: generateSlug(product.name),
       inStock: true // Add stock status
@@ -70,13 +70,18 @@ export async function GET(request: NextRequest) {
     // Sort products
     if (validatedParams.sortBy) {
       filteredProducts.sort((a, b) => {
-        let aValue: any = a[validatedParams.sortBy as keyof typeof a]
-        let bValue: any = b[validatedParams.sortBy as keyof typeof b]
+        const key = validatedParams.sortBy as keyof typeof a;
+        let aValue = a[key];
+        let bValue = b[key];
         
         // Handle string comparison
         if (typeof aValue === 'string') {
-          aValue = aValue.toLowerCase()
-          bValue = bValue.toLowerCase()
+          aValue = (aValue as string).toLowerCase();
+          bValue = (bValue as string).toLowerCase();
+        } else if (typeof aValue === 'number') {
+          // For numbers, keep as is
+          aValue = aValue as number;
+          bValue = bValue as number;
         }
         
         if (validatedParams.sortOrder === 'desc') {

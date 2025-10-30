@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 import { ArrowLeft, ShoppingCart, Heart, Star, Truck, Shield, RotateCcw, Eye, Minus, Plus, Check, ZoomIn, Package, Award, Users, Clock, X, ShoppingBag, Sparkles, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -192,12 +193,12 @@ export default function ProductDetail() {
             </h1>
             
             <h2 className="text-2xl font-semibold text-orange-600 mb-6">
-              The eyewear you're looking for seems to have vanished!
+              The eyewear you&apos;re looking for seems to have vanished!
             </h2>
             
             <p className="text-lg text-gray-600 mb-8 leading-relaxed max-w-lg mx-auto">
-              We couldn't find the specific product you're looking for. It might have been sold out, removed, or the link might be incorrect. 
-              But don't worry - we have many other amazing eyewear options for you to explore!
+              We couldn&apos;t find the specific product you&apos;re looking for. It might have been sold out, removed, or the link might be incorrect. 
+              But don&apos;t worry - we have many other amazing eyewear options for you to explore!
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -353,13 +354,17 @@ export default function ProductDetail() {
       <header className="bg-white border-b sticky top-0 z-40 backdrop-blur-lg bg-white/95">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4">
-            <Link href="/">
-              <div className="flex items-center gap-2 group">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Eye className="w-6 h-6 text-white" />
-                </div>
-                <h1 className="text-xl font-bold text-gray-900">Metro Optics</h1>
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-10 h-10 flex items-center justify-center">
+                <Image 
+                  src="/logo.png" 
+                  alt="Metro Optics Logo"
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 object-contain"
+                />
               </div>
+              <h1 className="text-xl font-bold text-gray-900">Metro Optics</h1>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link href="/products" className="text-gray-600 hover:text-blue-600 transition-colors">

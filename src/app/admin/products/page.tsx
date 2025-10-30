@@ -39,9 +39,24 @@ import {
   Edit, 
   Trash2, 
   Eye,
-  Filter,
   Download
 } from "lucide-react"
+
+type Product = {
+  id: number;
+  name: string;
+  brand: string;
+  category: string;
+  price: number;
+  originalPrice: number;
+  stock: number;
+  status: 'active' | 'inactive';
+  badge?: string;
+  rating: number;
+  reviews: number;
+  image: string;
+  description?: string;
+};
 
 // Mock data - in real app, this would come from API
 const products = [
@@ -107,7 +122,7 @@ function ProductsManagementContent() {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedStatus, setSelectedStatus] = useState("all")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [editingProduct, setEditingProduct] = useState<any>(null)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -118,7 +133,7 @@ function ProductsManagementContent() {
     return matchesSearch && matchesCategory && matchesStatus
   })
 
-  const ProductForm = ({ product, onClose }: { product?: any, onClose: () => void }) => {
+  const ProductForm = ({ product, onClose }: { product?: Product, onClose: () => void }) => {
     const [formData, setFormData] = useState({
       name: product?.name || "",
       brand: product?.brand || "",

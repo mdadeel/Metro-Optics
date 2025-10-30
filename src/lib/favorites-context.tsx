@@ -29,7 +29,7 @@ type FavoritesAction =
 
 const FavoritesContext = createContext<{
   state: FavoritesState
-  addToFavorites: (product: any) => void
+  addToFavorites: (product: Omit<FavoriteItem, 'id'> & { id?: number }) => void
   removeFromFavorites: (id: number) => void
   clearFavorites: () => void
   isFavorite: (id: number) => boolean
@@ -110,7 +110,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('favorites', JSON.stringify(state.items))
   }, [state.items])
 
-  const addToFavorites = async (product: any) => {
+  const addToFavorites = async (product: Omit<FavoriteItem, 'id'> & { id?: number }) => {
     try {
       const response = await fetch('/api/favorites', {
         method: 'POST',

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { hashPassword, generateToken } from '@/lib/auth'
 
 // Mock user database with hashed passwords - in production, this would be a real database
-let users = [
+const users = [
   {
     id: 1,
     name: 'Rahman Ahmed',

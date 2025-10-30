@@ -17,7 +17,7 @@ export default function NotFound() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-gray-600">
-            Sorry, we couldn't find the page you're looking for. The page might have been removed, renamed, or is temporarily unavailable.
+            Sorry, we couldn&apos;t find the page you&apos;re looking for. The page might have been removed, renamed, or is temporarily unavailable.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
       { status: 401 }
     )
   } catch (error) {
+    console.error('Admin auth error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -68,6 +69,7 @@ export async function POST(request: NextRequest) {
       { status: 401 }
     )
   } catch (error) {
+    console.error('Admin auth error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

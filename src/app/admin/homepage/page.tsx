@@ -33,10 +33,62 @@ import {
   MoveDown,
   Eye,
   Image as ImageIcon,
-  Type,
   Star,
   Package
 } from "lucide-react"
+
+type HeroSection = {
+  title: string;
+  subtitle: string;
+  buttonText: string;
+  buttonLink: string;
+  backgroundImage: string;
+  enabled: boolean;
+};
+
+type Testimonial = {
+  id: number;
+  name: string;
+  rating: number;
+  comment: string;
+  avatar: string;
+};
+
+type Service = {
+  id: number;
+  title: string;
+  description: string;
+};
+
+type TestimonialsSection = {
+  title: string;
+  subtitle: string;
+  enabled: boolean;
+  testimonials: Testimonial[];
+};
+
+type FeaturedProductsSection = {
+  title: string;
+  subtitle: string;
+  enabled: boolean;
+  productIds: number[];
+};
+
+type CategoriesSection = {
+  title: string;
+  subtitle: string;
+  enabled: boolean;
+  categoryIds: number[];
+};
+
+type ServicesSection = {
+  title: string;
+  subtitle: string;
+  enabled: boolean;
+  services: Service[];
+};
+
+
 
 // Mock data - in real app, this would come from API
 const homepageData = {
@@ -119,9 +171,9 @@ export default function HomepageManagement() {
 
 function HomepageManagementContent() {
   const [activeTab, setActiveTab] = useState("hero")
-  const [editingSection, setEditingSection] = useState<any>(null)
+  const [editingSection, setEditingSection] = useState<{section: string, data: HeroSection | FeaturedProductsSection | CategoriesSection | TestimonialsSection | ServicesSection} | null>(null)
 
-  const HeroSectionForm = ({ data, onClose }: { data: any, onClose: () => void }) => {
+  const HeroSectionForm = ({ data, onClose }: { data: HeroSection, onClose: () => void }) => {
     const [formData, setFormData] = useState(data)
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -199,7 +251,7 @@ function HomepageManagementContent() {
     )
   }
 
-  const SectionForm = ({ section, data, onClose }: { section: string, data: any, onClose: () => void }) => {
+  const SectionForm = ({ section, data, onClose }: { section: string, data: HeroSection | FeaturedProductsSection | CategoriesSection | TestimonialsSection | ServicesSection, onClose: () => void }) => {
     const [formData, setFormData] = useState(data)
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -426,7 +478,7 @@ function HomepageManagementContent() {
                     </div>
                     
                     <div className="space-y-3">
-                      {homepageData.testimonials.testimonials.map((testimonial: any) => (
+                      {homepageData.testimonials.testimonials.map((testimonial: Testimonial) => (
                         <div key={testimonial.id} className="bg-gray-50 p-4 rounded-lg">
                           <div className="flex items-center gap-2 mb-2">
                             <div className="flex">
@@ -468,7 +520,7 @@ function HomepageManagementContent() {
                     </div>
                     
                     <div className="space-y-3">
-                      {homepageData.services.services.map((service: any) => (
+                      {homepageData.services.services.map((service: Service) => (
                         <div key={service.id} className="bg-gray-50 p-4 rounded-lg">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">

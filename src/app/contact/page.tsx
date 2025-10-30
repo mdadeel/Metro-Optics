@@ -58,7 +58,7 @@ export default function ContactPage() {
               Get in Touch
             </h1>
             <p className="text-xl opacity-90 mb-8">
-              We're here to help you find the perfect eyewear. Reach out to us through any of the channels below.
+              We&apos;re here to help you find the perfect eyewear. Reach out to us through any of the channels below.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Badge className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 text-sm">
@@ -135,14 +135,14 @@ export default function ContactPage() {
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
               <p className="text-gray-600 mb-8">
-                Have a question or need assistance? Fill out the form below and we'll get back to you soon.
+                Have a question or need assistance? Fill out the form below and we&apos;ll get back to you soon.
               </p>
 
               {isSubmitted ? (
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-8 text-center">
                   <CheckCircle className="w-16 h-16 text-emerald-600 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Message Sent Successfully!</h3>
-                  <p className="text-gray-600">Thank you for contacting us. We'll get back to you within 24 hours.</p>
+                  <p className="text-gray-600">Thank you for contacting us. We&apos;ll get back to you within 24 hours.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">

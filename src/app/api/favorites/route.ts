@@ -2,8 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 import { z } from 'zod'
 
+type FavoriteItem = {
+  id: number;
+  productId: number;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  discount?: number;
+  addedAt?: string;
+};
+
 // Mock favorites database - in production, this would be a real database
-let userFavorites: { [userId: number]: any[] } = {}
+const userFavorites: { [userId: number]: FavoriteItem[] } = {}
 
 const favoriteItemSchema = z.object({
   productId: z.number(),

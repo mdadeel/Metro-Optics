@@ -212,7 +212,7 @@ export default function FavoritesPage() {
                 </Link>
                 <Link href="/deals">
                   <Button variant="outline" className="w-full">
-                    View Today's Deals
+                    View Today&apos;s Deals
                   </Button>
                 </Link>
               </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { ShoppingCart, Plus, Minus, Trash2, ArrowLeft, Shield, Truck, RefreshCw, CreditCard, ChevronRight, Check, Package, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -104,7 +105,7 @@ export default function CartPage() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
             <p className="text-gray-600 mb-8">
-              Looks like you haven't added any eyewear to your cart yet. Start shopping for perfect glasses!
+              Looks like you haven&apos;t added any eyewear to your cart yet. Start shopping for perfect glasses!
             </p>
             <div className="space-y-4">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold w-full">
@@ -115,7 +116,7 @@ export default function CartPage() {
               </Button>
               <Link href="/deals" className="block">
                 <Button variant="outline" className="w-full">
-                  View Today's Deals
+                  View Today&apos;s Deals
                 </Button>
               </Link>
             </div>
@@ -177,8 +178,14 @@ export default function CartPage() {
                 </Button>
               </Link>
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <ShoppingCart className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <Image 
+                    src="/logo.png" 
+                    alt="Metro Optics Logo"
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 object-contain"
+                  />
                 </div>
                 <h1 className="text-xl font-bold text-gray-900">Metro Optics</h1>
               </div>

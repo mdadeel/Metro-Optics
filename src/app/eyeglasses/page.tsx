@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Search, Filter, Star, Eye, Glasses } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -61,8 +62,14 @@ export default function EyeglassesPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link href="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <Glasses className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <Image 
+                    src="/logo.png" 
+                    alt="Metro Optics Logo"
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 object-contain"
+                  />
                 </div>
                 <h1 className="text-xl font-bold text-gray-900">Eyeglasses</h1>
               </Link>

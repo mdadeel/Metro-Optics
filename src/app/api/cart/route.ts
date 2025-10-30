@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 import { z } from 'zod'
 
+type CartItem = {
+  id: number;
+  productId: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+};
+
 // Mock cart database - in production, this would be a real database
-let userCarts: { [userId: number]: any[] } = {}
+const userCarts: { [userId: number]: CartItem[] } = {}
 
 const cartItemSchema = z.object({
   productId: z.number(),

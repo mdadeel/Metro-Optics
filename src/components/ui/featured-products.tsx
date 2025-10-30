@@ -179,7 +179,7 @@ export default function FeaturedProducts() {
               </div>
               
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
-                The eyewear you're looking for seems to have vanished!
+                The eyewear you&apos;re looking for seems to have vanished!
               </h3>
               <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed">
                 No products found in this category. Try exploring other categories or browse our complete collection.

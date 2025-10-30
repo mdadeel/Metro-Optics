@@ -38,18 +38,17 @@ import {
   Edit, 
   Trash2, 
   Package,
-  Eye,
-  Image as ImageIcon
+  Eye
 } from "lucide-react"
 
 // Mock data - in real app, this would come from API
-const categories = [
+const categories: Category[] = [
   {
     id: 1,
     name: "Sunglasses",
     description: "Stylish sunglasses for UV protection",
     productCount: 156,
-    status: "active",
+    status: "active" as const,
     featured: true,
     image: "/api/placeholder/80/80",
     slug: "sunglasses"
@@ -59,7 +58,7 @@ const categories = [
     name: "Eyeglasses",
     description: "Prescription and non-prescription eyeglasses",
     productCount: 234,
-    status: "active",
+    status: "active" as const,
     featured: true,
     image: "/api/placeholder/80/80",
     slug: "eyeglasses"
@@ -69,7 +68,7 @@ const categories = [
     name: "Contact Lenses",
     description: "Daily and monthly disposable contact lenses",
     productCount: 89,
-    status: "active",
+    status: "active" as const,
     featured: false,
     image: "/api/placeholder/80/80",
     slug: "contact-lenses"
@@ -79,7 +78,7 @@ const categories = [
     name: "Accessories",
     description: "Cases, cleaning solutions, and more",
     productCount: 45,
-    status: "inactive",
+    status: "inactive" as const,
     featured: false,
     image: "/api/placeholder/80/80",
     slug: "accessories"
@@ -96,11 +95,22 @@ export default function CategoriesManagement() {
   )
 }
 
+type Category = {
+  id: number;
+  name: string;
+  description: string;
+  productCount: number;
+  status: 'active' | 'inactive';
+  featured: boolean;
+  image: string;
+  slug: string;
+};
+
 function CategoriesManagementContent() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<any>(null)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 
-  const CategoryForm = ({ category, onClose }: { category?: any, onClose: () => void }) => {
+  const CategoryForm = ({ category, onClose }: { category?: Category, onClose: () => void }) => {
     const [formData, setFormData] = useState({
       name: category?.name || "",
       description: category?.description || "",

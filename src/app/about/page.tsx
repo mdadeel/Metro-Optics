@@ -1,6 +1,7 @@
 'use client';
 
 import { Eye, Heart, Award, Users, Globe, Shield, Truck, Clock, Target, Sparkles, CheckCircle } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -80,10 +81,10 @@ export default function AboutPage() {
                 <p className="leading-relaxed">
                   Founded in 2009, OpticalBD began with a simple mission: to provide Bangladeshis with 
                   access to world-class eyewear at affordable prices. What started as a small optical shop 
-                  in Dhaka has grown into the nation's most trusted eyewear destination.
+                  in Dhaka has grown into the nation&apos;s most trusted eyewear destination.
                 </p>
                 <p className="leading-relaxed">
-                  We believe that clear vision is a fundamental right, not a luxury. That's why we've 
+                  We believe that clear vision is a fundamental right, not a luxury. That&apos;s why we&apos;ve 
                   carefully curated collections from renowned international brands while maintaining 
                   prices that make quality eyewear accessible to everyone.
                 </p>
@@ -108,9 +109,11 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="relative">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&h=500&fit=crop&crop=center"
                 alt="Our Story"
+                width={600}
+                height={500}
                 className="rounded-2xl shadow-2xl w-full"
               />
               <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-2xl filter blur-2xl opacity-40"></div>

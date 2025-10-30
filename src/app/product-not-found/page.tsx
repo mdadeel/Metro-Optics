@@ -29,12 +29,12 @@ export default function ProductNotFound() {
             </h1>
             
             <h2 className="text-2xl font-semibold text-orange-600 mb-6">
-              The eyewear you're looking for seems to have vanished!
+              The eyewear you&apos;re looking for seems to have vanished!
             </h2>
             
             <p className="text-lg text-gray-600 mb-8 leading-relaxed max-w-lg mx-auto">
-              We couldn't find the specific product you're looking for. It might have been sold out, removed, or the link might be incorrect. 
-              But don't worry - we have many other amazing eyewear options for you to explore!
+              We couldn&apos;t find the specific product you&apos;re looking for. It might have been sold out, removed, or the link might be incorrect. 
+              But don&apos;t worry - we have many other amazing eyewear options for you to explore!
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
