@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { Product } from '@prisma/client';
 
 // Helper function to generate slugs
 function generateSlug(name: string): string {
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')
     const featured = searchParams.get('featured')
 
-    let products = []
+    let products: Product[] = []
     
     try {
       products = await db.product.findMany({ 
