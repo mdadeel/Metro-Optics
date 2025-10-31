@@ -30,19 +30,26 @@ export async function GET(request: NextRequest) {
   try {
     const authToken = request.cookies.get('auth-token')?.value
     if (!authToken) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      // Return empty favorites instead of 401 for unauthenticated users
+      return NextResponse.json({ favorites: [], authenticated: false })
     }
 
     const user = verifyToken(authToken)
     if (!user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+      // Return empty favorites instead of 401 for invalid token
+      return NextResponse.json({ favorites: [], authenticated: false })
     }
 
     const favorites = userFavorites[user.id] || []
-    return NextResponse.json({ favorites })
+    return NextResponse.json({ favorites, authenticated: true })
   } catch (error) {
     console.error('Get favorites error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    // Return empty favorites instead of 500 to prevent breaking frontend
+    return NextResponse.json({ 
+      favorites: [], 
+      authenticated: false,
+      error: 'Failed to retrieve favorites'
+    })
   }
 }
 
@@ -51,12 +58,20 @@ export async function POST(request: NextRequest) {
   try {
     const authToken = request.cookies.get('auth-token')?.value
     if (!authToken) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ 
+        error: 'Authentication required', 
+        authenticated: false,
+        favorites: [] 
+      }, { status: 401 })
     }
 
     const user = verifyToken(authToken)
     if (!user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+      return NextResponse.json({ 
+        error: 'Invalid token', 
+        authenticated: false,
+        favorites: [] 
+      }, { status: 401 })
     }
 
     const body = await request.json()
@@ -72,7 +87,8 @@ export async function POST(request: NextRequest) {
     if (existingItem) {
       return NextResponse.json({ 
         message: 'Item already in favorites',
-        favorites: userFavorites[user.id]
+        favorites: userFavorites[user.id],
+        authenticated: true
       })
     }
 
@@ -85,14 +101,19 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       message: 'Item added to favorites',
-      favorites: userFavorites[user.id]
+      favorites: userFavorites[user.id],
+      authenticated: true
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Validation failed', details: error.issues }, { status: 400 })
     }
     console.error('Add to favorites error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      authenticated: false,
+      favorites: []
+    }, { status: 500 })
   }
 }
 
@@ -101,12 +122,20 @@ export async function DELETE(request: NextRequest) {
   try {
     const authToken = request.cookies.get('auth-token')?.value
     if (!authToken) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ 
+        error: 'Authentication required', 
+        authenticated: false,
+        favorites: [] 
+      }, { status: 401 })
     }
 
     const user = verifyToken(authToken)
     if (!user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+      return NextResponse.json({ 
+        error: 'Invalid token', 
+        authenticated: false,
+        favorites: [] 
+      }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -117,22 +146,35 @@ export async function DELETE(request: NextRequest) {
     }
 
     if (!userFavorites[user.id]) {
-      return NextResponse.json({ error: 'Favorites not found' }, { status: 404 })
+      return NextResponse.json({ 
+        error: 'Favorites not found', 
+        favorites: [],
+        authenticated: true
+      }, { status: 404 })
     }
 
     const initialLength = userFavorites[user.id].length
     userFavorites[user.id] = userFavorites[user.id].filter(item => item.id !== parseInt(favoriteItemId))
 
     if (userFavorites[user.id].length === initialLength) {
-      return NextResponse.json({ error: 'Item not found in favorites' }, { status: 404 })
+      return NextResponse.json({ 
+        error: 'Item not found in favorites', 
+        favorites: userFavorites[user.id],
+        authenticated: true
+      }, { status: 404 })
     }
 
     return NextResponse.json({ 
       message: 'Item removed from favorites',
-      favorites: userFavorites[user.id]
+      favorites: userFavorites[user.id],
+      authenticated: true
     })
   } catch (error) {
     console.error('Remove from favorites error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      authenticated: false,
+      favorites: []
+    }, { status: 500 })
   }
 }

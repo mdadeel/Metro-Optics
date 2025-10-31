@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-for-development';
 if (!process.env.JWT_SECRET) {
   console.warn('JWT_SECRET environment variable is not defined, using fallback key');
+  console.info('For production, please set JWT_SECRET in your environment variables');
 }
 
 export async function hashPassword(password: string): Promise<string> {

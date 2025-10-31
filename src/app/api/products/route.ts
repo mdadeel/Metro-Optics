@@ -38,32 +38,46 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')
     const featured = searchParams.get('featured')
 
-    const products = await db.product.findMany({ 
-      where: {
-        ...(category && { category }),
-        ...(brand && { brand }),
-        ...(minPrice && { price: { gte: parseFloat(minPrice) } }),
-        ...(maxPrice && { price: { lte: parseFloat(maxPrice) } }),
-        ...(rating && { rating: { gte: parseFloat(rating) } }),
-        ...(inStock === 'true' && { stock: { gt: 0 } }),
-        ...(search && {
-          OR: [
-            { name: { contains: search } },
-            { brand: { contains: search } },
-            { description: { contains: search } }
-          ]
-        }),
-        ...(featured === 'true' && {
-          OR: [
-            { badge: { not: null } },
-            { rating: { gte: 4.5 } },
-            { reviews: { gt: 100 } }
-          ]
-        })
-      },
-      orderBy: getSortOption(sortBy), 
-      take: limit ? parseInt(limit) : undefined
-    })
+    let products = []
+    
+    try {
+      products = await db.product.findMany({ 
+        where: {
+          ...(category && { category }),
+          ...(brand && { brand }),
+          ...(minPrice && { price: { gte: parseFloat(minPrice) } }),
+          ...(maxPrice && { price: { lte: parseFloat(maxPrice) } }),
+          ...(rating && { rating: { gte: parseFloat(rating) } }),
+          ...(inStock === 'true' && { stock: { gt: 0 } }),
+          ...(search && {
+            OR: [
+              { name: { contains: search } },
+              { brand: { contains: search } },
+              { description: { contains: search } }
+            ]
+          }),
+          ...(featured === 'true' && {
+            OR: [
+              { badge: { not: null } },
+              { rating: { gte: 4.5 } },
+              { reviews: { gt: 100 } }
+            ]
+          })
+        },
+        orderBy: getSortOption(sortBy), 
+        take: limit ? parseInt(limit) : undefined
+      })
+    } catch (dbError) {
+      console.error('Database error in products API:', dbError)
+      // Return empty array instead of throwing error to prevent 500
+      return NextResponse.json([], {
+        headers: {
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
+          'CDN-Cache-Control': 'public, s-maxage=300',
+          'Vercel-CDN-Cache-Control': 'public, s-maxage=300'
+        }
+      })
+    }
 
     // Transform products to include a single image field and slug for frontend compatibility
     const transformedProducts = products.map(product => ({
