@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useProducts } from '@/hooks/use-products'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Star, Heart, ShoppingCart, Eye, TrendingUp, Sparkles, Award, ChevronDown } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import { Star, Heart, ShoppingCart, Eye, TrendingUp, Sparkles, Award } from 'lucide-react'
+import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useCart } from '@/lib/cart-context'
@@ -63,14 +63,12 @@ export default function FeaturedProducts() {
       name: product.name,
       price: product.price,
       image: product.image,
-      quantity: 1,
       description: product.description || '',
       originalPrice: product.originalPrice,
       category: product.category,
       brand: product.brand,
       rating: product.rating,
       reviews: product.reviews,
-      inStock: product.inStock || true
     })
   }
 
@@ -274,7 +272,7 @@ export default function FeaturedProducts() {
                       </span>
                       <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
                       <span className="text-xs text-blue-600 capitalize font-medium hover:text-blue-700 transition-colors duration-300">
-                        {product.category.replace('-', ' ')}
+                        {product.category ? product.category.replace('-', ' ') : 'N/A'}
                       </span>
                     </div>
                   </div>
@@ -293,7 +291,7 @@ export default function FeaturedProducts() {
                         <Star
                           key={i}
                           className={`w-3 h-3 sm:w-3 sm:h-3 transition-all duration-300 ${
-                            i < Math.floor(product.rating)
+                            i < Math.floor(product.rating || 0)
                               ? 'fill-yellow-400 text-yellow-400'
                               : 'text-gray-300'
                           }`}

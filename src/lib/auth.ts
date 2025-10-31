@@ -24,7 +24,7 @@ type UserSession = {
   memberSince?: string;
   totalOrders?: number;
   totalSpent?: number;
-  [key: string]: any; // Allow other properties
+  [key: string]: string | number | undefined; // Allow other properties
 };
 
 export function generateToken(payload: UserSession): string {
@@ -34,7 +34,7 @@ export function generateToken(payload: UserSession): string {
 export function verifyToken(token: string): UserSession | null {
   try {
     return jwt.verify(token, JWT_SECRET) as UserSession
-  } catch (error) {
+  } catch {
     return null
   }
 }

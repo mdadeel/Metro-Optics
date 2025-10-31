@@ -1,7 +1,6 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 interface Product {
   id: number;
@@ -54,9 +53,7 @@ interface StoreState {
   logout: () => void;
 }
 
-export const useStore = create<StoreState>()(
-  persist(
-    (set, get) => ({
+export const useStore = create<StoreState>()((set, get) => ({
       // Cart
       cart: [],
       addToCart: (product) => {
@@ -129,14 +126,5 @@ export const useStore = create<StoreState>()(
       logout: () => {
         set({ user: null });
       },
-    }),
-    {
-      name: 'opticalbd-store',
-      partialize: (state) => ({
-        cart: state.cart,
-        favorites: state.favorites,
-        user: state.user,
-      }),
-    }
-  )
-);
+
+}));

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { toast } from '@/hooks/use-toast'
-import { handleApiError, safeApiCall } from '@/lib/error-handler'
+import { safeApiCall } from '@/lib/error-handler'
 
 interface User {
   id: number
@@ -118,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = async () => {
-    const result = await safeApiCall(async () => {
+    await safeApiCall(async () => {
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include'

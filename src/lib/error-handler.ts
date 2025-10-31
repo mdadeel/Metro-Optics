@@ -29,15 +29,21 @@ export const handleApiError = (error: unknown): string => {
       case 500:
         return 'Server error. Please try again later.'
       default:
-        return error.data?.error || error.message || 'An unexpected error occurred.'
+        interface ErrorWithOptionalData {
+          data?: { error?: string };
+          message?: string;
+        }
+        const errorWithOptionalData = error as ErrorWithOptionalData
+        return errorWithOptionalData.data?.error || errorWithOptionalData.message || 'An unexpected error occurred.'
     }
   }
   
-  if (error.name === 'NetworkError' || error.message.includes('fetch')) {
+  const errorObj = error as { name?: string; message?: string }
+  if (errorObj.name === 'NetworkError' || (errorObj.message && errorObj.message.includes('fetch'))) {
     return 'Network error. Please check your internet connection.'
   }
   
-  return error.message || 'An unexpected error occurred.'
+  return (error as { message?: string }).message || 'An unexpected error occurred.'
 }
 
 export const safeApiCall = async <T>(
@@ -102,8 +108,8 @@ export const useApiCall = () => {
 
 // Validation error handler
 export const handleValidationError = (error: unknown): string => {
-  if (error && typeof error === 'object' && 'issues' in error && Array.isArray((error as any).issues)) {
-    return (error as any).issues.map((issue: unknown) => {
+  if (error && typeof error === 'object' && 'issues' in error && Array.isArray((error as { issues: unknown[] }).issues)) {
+    return (error as { issues: { message: string }[] }).issues.map((issue: unknown) => {
       if (issue && typeof issue === 'object' && 'message' in issue) {
         return (issue as { message: string }).message;
       }
@@ -115,9 +121,9 @@ export const handleValidationError = (error: unknown): string => {
 
 // Form error handler
 export const handleFormError = (error: unknown, fieldName?: string): string => {
-  if (error && typeof error === 'object' && 'issues' in error && Array.isArray((error as any).issues)) {
-    const fieldError = (error as any).issues.find((issue: unknown) => 
-      issue && typeof issue === 'object' && 'path' in issue && Array.isArray((issue as any).path) && (issue as any).path.includes(fieldName)
+  if (error && typeof error === 'object' && 'issues' in error && Array.isArray((error as { issues: unknown[] }).issues)) {
+    const fieldError = (error as { issues: { path: string[] }[] }).issues.find((issue: unknown) => 
+      issue && typeof issue === 'object' && 'path' in issue && Array.isArray((issue as { path: string[] }).path) && fieldName && (issue as { path: string[] }).path.includes(fieldName)
     );
     if (fieldError && typeof fieldError === 'object' && 'message' in fieldError) {
       return (fieldError as { message: string }).message || 'Invalid input';

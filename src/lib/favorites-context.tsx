@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react'
+import { Product } from '@/types/product'
 
 interface FavoriteItem {
   id: number
@@ -8,12 +9,13 @@ interface FavoriteItem {
   price: number
   originalPrice?: number
   image: string
-  category: string
+  category?: string // Made optional to match Product type
   description?: string
   discount?: number
   rating?: number
   reviews?: number
   brand?: string
+  [key: string]: unknown; // Index signature to match Product type
 }
 
 interface FavoritesState {
@@ -29,7 +31,7 @@ type FavoritesAction =
 
 const FavoritesContext = createContext<{
   state: FavoritesState
-  addToFavorites: (product: Omit<FavoriteItem, 'id'> & { id?: number }) => void
+  addToFavorites: (product: Product) => void
   removeFromFavorites: (id: number) => void
   clearFavorites: () => void
   isFavorite: (id: number) => boolean
@@ -105,12 +107,25 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     loadFavorites()
   }, [])
 
-  // Save favorites to localStorage whenever they change (fallback)
+  // Save favorites to localStorage with debouncing to prevent blocking main thread
   useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(state.items))
+    const saveFavorites = () => {
+      try {
+        localStorage.setItem('favorites', JSON.stringify(state.items));
+      } catch (error) {
+        console.error('Failed to save favorites to localStorage:', error);
+      }
+    };
+
+    // Debounce the save operation
+    const handle = setTimeout(() => {
+      saveFavorites();
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(handle);
   }, [state.items])
 
-  const addToFavorites = async (product: Omit<FavoriteItem, 'id'> & { id?: number }) => {
+  const addToFavorites = async (product: Product) => {
     try {
       const response = await fetch('/api/favorites', {
         method: 'POST',
@@ -131,12 +146,40 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
         dispatch({ type: 'LOAD_FAVORITES', payload: data.favorites })
       } else {
         // Fallback to local state
-        dispatch({ type: 'ADD_TO_FAVORITES', payload: product })
+        // Convert Product to FavoriteItem for local state
+        const favoriteItem: FavoriteItem = {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          originalPrice: product.originalPrice,
+          image: product.image,
+          category: product.category,
+          description: product.description,
+          discount: product.discount,
+          rating: product.rating,
+          reviews: product.reviews,
+          brand: product.brand
+        }
+        dispatch({ type: 'ADD_TO_FAVORITES', payload: favoriteItem })
       }
     } catch (error) {
       console.error('Failed to add to favorites via API:', error)
       // Fallback to local state
-      dispatch({ type: 'ADD_TO_FAVORITES', payload: product })
+      // Convert Product to FavoriteItem for local state
+      const favoriteItem: FavoriteItem = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        image: product.image,
+        category: product.category,
+        description: product.description,
+        discount: product.discount,
+        rating: product.rating,
+        reviews: product.reviews,
+        brand: product.brand
+      }
+      dispatch({ type: 'ADD_TO_FAVORITES', payload: favoriteItem })
     }
   }
 

@@ -7,19 +7,48 @@ import Image from 'next/image';
 
 import { ArrowLeft, ShoppingCart, Heart, Star, Truck, Shield, RotateCcw, Eye, Minus, Plus, Check, ZoomIn, Package, Award, Users, Clock, X, ShoppingBag, Sparkles, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCart } from '@/lib/cart-context';
 import { useFavorites } from '@/lib/favorites-context';
 
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  category: string;
+  inStock: boolean;
+  rating: number;
+  reviews: number;
+  brand: string;
+  description: string;
+  features?: string[];
+  material?: string;
+  color?: string;
+  frameType?: string;
+  shape?: string;
+  slug: string;
+}
+
+interface Review {
+  id: number;
+  userName: string;
+  rating: number;
+  title: string;
+  comment: string;
+  date: string;
+  verified: boolean;
+}
+
 export default function ProductDetail() {
   const params = useParams();
   const router = useRouter();
   const { addToCart } = useCart();
   const { addToFavorites, removeFromFavorites, favorites } = useFavorites();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -27,8 +56,8 @@ export default function ProductDetail() {
   const [selectedTab, setSelectedTab] = useState('features');
   const [showAddedToCart, setShowAddedToCart] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
-  const [reviews, setReviews] = useState<any[]>([]);
-  const [reviewsStats, setReviewsStats] = useState<any>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsStats, setReviewsStats] = useState<{ averageRating: number; total: number; ratingDistribution: { rating: number; count: number; percentage: number; }[] } | null>(null);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [selectedRating, setSelectedRating] = useState(0);
   const [reviewTitle, setReviewTitle] = useState('');
@@ -128,7 +157,7 @@ export default function ProductDetail() {
             ...reviewsStats,
             total: newTotal,
             averageRating: parseFloat(newAverage.toFixed(2)),
-            ratingDistribution: reviewsStats.ratingDistribution.map((dist: any) => 
+            ratingDistribution: reviewsStats.ratingDistribution.map((dist: { rating: number; count: number; percentage: number; }) => 
               dist.rating === selectedRating 
                 ? {...dist, count: dist.count + 1, percentage: ((dist.count + 1) / newTotal) * 100}
                 : dist
@@ -289,7 +318,6 @@ export default function ProductDetail() {
       name: product.name,
       price: product.price,
       image: product.image,
-      quantity: quantity
     });
     setShowAddedToCart(true);
     setTimeout(() => setShowAddedToCart(false), 3000);
@@ -346,7 +374,7 @@ export default function ProductDetail() {
     'Warranty': '1 Year'
   };
 
-  const relatedProducts = []; // This would come from an API
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -394,9 +422,11 @@ export default function ProductDetail() {
               {imageLoading && (
                 <div className="absolute inset-0 bg-gray-200 animate-pulse" />
               )}
-              <img
+              <Image
                 src={productImages[selectedImage]}
                 alt={product.name}
+                width={600}
+                height={600}
                 className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 cursor-zoom-in ${
                   imageLoading ? 'opacity-0' : 'opacity-100'
                 }`}
@@ -436,9 +466,11 @@ export default function ProductDetail() {
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <img
+                  <Image
                     src={image}
                     alt={`${product.name} ${index + 1}`}
+                    width={150}
+                    height={150}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                   />
                 </button>
@@ -654,7 +686,7 @@ export default function ProductDetail() {
                       </div>
                       
                       <div className="lg:col-span-2">
-                        {reviewsStats?.ratingDistribution?.map((dist: any) => (
+                        {reviewsStats?.ratingDistribution?.map((dist: { rating: number; count: number; percentage: number; }) => (
                           <div key={dist.rating} className="flex items-center gap-3 mb-2">
                             <span className="w-8 text-sm font-medium">{dist.rating}★</span>
                             <div className="flex-1 bg-gray-200 rounded-full h-2">
@@ -736,7 +768,7 @@ export default function ProductDetail() {
                       <h4 className="font-semibold text-lg">Customer Reviews</h4>
                       
                       {reviews && reviews.length > 0 ? (
-                        reviews.map((review) => (
+                        reviews.map((review: Review) => (
                           <div key={review.id} className="border-b pb-6 last:border-b-0">
                             <div className="flex items-start justify-between">
                               <div>
@@ -806,9 +838,11 @@ export default function ProductDetail() {
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-zoom-out"
           onClick={() => setIsZoomed(false)}
         >
-          <img
+          <Image
             src={productImages[selectedImage]}
             alt={product.name}
+            width={1200}
+            height={1200}
             className="max-w-full max-h-full object-contain animate-scale-in-smooth"
           />
           <Button

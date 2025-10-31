@@ -10,7 +10,6 @@ import {
   Shield, 
   CheckCircle, 
   Package,
-  CreditCard,
   Phone,
   Mail
 } from 'lucide-react'

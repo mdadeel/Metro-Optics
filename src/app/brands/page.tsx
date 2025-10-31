@@ -8,21 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Search, Star, ShoppingCart, Building } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-
-type Product = {
-  id: number;
-  name: string;
-  brand: string;
-  price: number;
-  originalPrice?: number;
-  discount?: number;
-  rating: number;
-  reviews: number;
-  image: string;
-  description?: string;
-  inStock: boolean;
-  category: string;
-};
+import { Product } from "@/types/product"
 
 export default function BrandsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -38,7 +24,7 @@ export default function BrandsPage() {
         if (response.ok) {
           const data: Product[] = await response.json()
           setProducts(data)
-          const uniqueBrands = [...new Set(data.map((p: Product) => p.brand).filter(Boolean))] as string[]
+          const uniqueBrands = [...new Set(data.map((p: Product) => p.brand).filter((brand): brand is string => Boolean(brand)))] as string[]
           setBrands(uniqueBrands)
         }
       } catch (error) {
@@ -52,13 +38,13 @@ export default function BrandsPage() {
     let filtered = products
 
     if (selectedBrand !== "all") {
-      filtered = filtered.filter(product => product.brand === selectedBrand)
+      filtered = filtered.filter(product => product.brand && product.brand === selectedBrand)
     }
 
     if (searchQuery) {
       filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchQuery.toLowerCase())
+        (product.brand && product.brand.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     }
 
@@ -66,9 +52,9 @@ export default function BrandsPage() {
   }, [products, selectedBrand, searchQuery])
 
   const getBrandStats = (brand) => {
-    const brandProducts = products.filter(p => p.brand === brand)
-    const avgRating = brandProducts.reduce((sum, p) => sum + p.rating, 0) / brandProducts.length
-    const totalReviews = brandProducts.reduce((sum, p) => sum + p.reviews, 0)
+    const brandProducts = products.filter(p => p.brand && p.brand === brand)
+    const avgRating = brandProducts.reduce((sum, p) => sum + (p.rating || 0), 0) / brandProducts.length
+    const totalReviews = brandProducts.reduce((sum, p) => sum + (p.reviews || 0), 0)
     const minPrice = Math.min(...brandProducts.map(p => p.price))
     const maxPrice = Math.max(...brandProducts.map(p => p.price))
     
@@ -218,7 +204,7 @@ export default function BrandsPage() {
                   <CardContent className="p-4">
                     <div className="mb-2">
                       <Badge variant="secondary" className="text-xs">
-                        {product.brand}
+                        {product.brand || 'Brand N/A'}
                       </Badge>
                     </div>
                     <h3 className="font-semibold text-gray-900 mb-2">{product.name}</h3>

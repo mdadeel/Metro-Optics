@@ -41,25 +41,10 @@ import {
   Eye,
   Download
 } from "lucide-react"
-
-type Product = {
-  id: number;
-  name: string;
-  brand: string;
-  category: string;
-  price: number;
-  originalPrice: number;
-  stock: number;
-  status: 'active' | 'inactive';
-  badge?: string;
-  rating: number;
-  reviews: number;
-  image: string;
-  description?: string;
-};
+import { Product } from "@/types/product"
 
 // Mock data - in real app, this would come from API
-const products = [
+const products: Product[] = [
   {
     id: 1,
     name: "Wayfarer Classic",
@@ -126,7 +111,7 @@ function ProductsManagementContent() {
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.brand.toLowerCase().includes(searchTerm.toLowerCase())
+                         (product.brand && product.brand.toLowerCase().includes(searchTerm.toLowerCase()))
     const matchesCategory = selectedCategory === "all" || product.category === selectedCategory
     const matchesStatus = selectedStatus === "all" || product.status === selectedStatus
     
@@ -139,7 +124,7 @@ function ProductsManagementContent() {
       brand: product?.brand || "",
       category: product?.category || "",
       price: product?.price || "",
-      originalPrice: product?.originalPrice || "",
+      originalPrice: product?.originalPrice ? String(product.originalPrice) : "",
       stock: product?.stock || "",
       description: product?.description || "",
       badge: product?.badge || "",
@@ -255,7 +240,7 @@ function ProductsManagementContent() {
 
         <div>
           <Label htmlFor="status">Status</Label>
-          <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
+          <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value as 'active' | 'inactive' | 'out_of_stock'})}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -384,7 +369,7 @@ function ProductsManagementContent() {
                           <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
                           <div>
                             <p className="font-medium">{product.name}</p>
-                            <p className="text-sm text-gray-500">{product.brand}</p>
+                            <p className="text-sm text-gray-500">{product.brand || 'N/A'}</p>
                             {product.badge && (
                               <Badge variant="outline" className="text-xs mt-1">
                                 {product.badge}
@@ -397,7 +382,7 @@ function ProductsManagementContent() {
                       <TableCell>
                         <div>
                           <p className="font-medium">৳{product.price.toLocaleString()}</p>
-                          {product.originalPrice > product.price && (
+                          {product.originalPrice && product.originalPrice > product.price && (
                             <p className="text-sm text-gray-500 line-through">
                               ৳{product.originalPrice.toLocaleString()}
                             </p>
@@ -417,14 +402,14 @@ function ProductsManagementContent() {
                                      product.status === 'inactive' ? 'bg-gray-100 text-gray-800' : 
                                      'bg-red-100 text-red-800'}
                         >
-                          {product.status.replace('_', ' ')}
+                          {product.status ? product.status.replace('_', ' ') : 'N/A'}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <span>⭐</span>
-                          <span>{product.rating}</span>
-                          <span className="text-gray-500 text-sm">({product.reviews})</span>
+                          <span>{product.rating || 0}</span>
+                          <span className="text-gray-500 text-sm">({product.reviews || 0})</span>
                         </div>
                       </TableCell>
                       <TableCell>

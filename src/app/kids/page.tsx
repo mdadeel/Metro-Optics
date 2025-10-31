@@ -22,6 +22,8 @@ type KidsProduct = {
   description?: string;
   inStock: boolean;
   category: string;
+  badge?: string;
+  slug?: string;
 };
 
 export default function KidsPage() {

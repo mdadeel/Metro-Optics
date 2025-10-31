@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react'
 import { toast } from '@/hooks/use-toast'
-import { handleApiError, safeApiCall } from '@/lib/error-handler'
+import { safeApiCall } from '@/lib/error-handler'
 import { useAuth } from '@/lib/auth-context'
 
 interface CartItem {
@@ -11,7 +11,7 @@ interface CartItem {
   price: number
   originalPrice?: number
   image: string
-  category: string
+  category?: string
   quantity: number
   description?: string
   discount?: number
@@ -150,9 +150,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, authLoading])
 
-  // Save cart to localStorage whenever it changes (fallback)
+  // Save cart to localStorage with debouncing to prevent blocking main thread
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(state.items))
+    const saveCart = () => {
+      try {
+        localStorage.setItem('cart', JSON.stringify(state.items));
+      } catch (error) {
+        console.error('Failed to save cart to localStorage:', error);
+      }
+    };
+
+    // Debounce the save operation using requestAnimationFrame to avoid blocking
+    const handle = setTimeout(() => {
+      saveCart();
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(handle);
   }, [state.items])
 
   const addToCart = async (product: Omit<CartItem, 'quantity'>) => {
@@ -185,7 +198,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       })
     } else {
       // Fallback to local state
-      dispatch({ type: 'ADD_TO_CART', payload: product })
+      dispatch({ type: 'ADD_TO_CART', payload: { ...product, quantity: 1 } })
       toast({
         title: "Added to Cart",
         description: `${product.name} added locally (sync when online)`,

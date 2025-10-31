@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Filter, Grid, List, Star, ChevronDown, SlidersHorizontal, X, Heart, ShoppingCart } from 'lucide-react'
+import { Search, Grid, List, Star, SlidersHorizontal, Heart, ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -15,23 +15,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useCart } from '@/lib/cart-context'
 import { useFavorites } from '@/lib/favorites-context'
-
-interface Product {
-  id: number
-  slug: string
-  name: string
-  price: number
-  originalPrice?: number
-  category: string
-  brand: string
-  image: string
-  rating: number
-  reviews: number
-  discount?: number
-  description: string
-  inStock: boolean
-  badge?: string
-}
+import { Product } from '@/types/product'
 
 interface Filters {
   category: string
@@ -125,8 +109,8 @@ export default function ProductsPage() {
   const filteredProducts = products.filter(product => {
     // Search filter
     if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !product.brand.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !product.description.toLowerCase().includes(searchQuery.toLowerCase())) {
+        !(product.brand && product.brand.toLowerCase().includes(searchQuery.toLowerCase())) &&
+        !(product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()))) {
       return false
     }
 
@@ -146,7 +130,7 @@ export default function ProductsPage() {
     }
 
     // Rating filter
-    if (filters.rating > 0 && product.rating < filters.rating) {
+    if (filters.rating > 0 && (product.rating || 0) < filters.rating) {
       return false
     }
 
@@ -163,11 +147,11 @@ export default function ProductsPage() {
       case 'price-high':
         return b.price - a.price
       case 'rating':
-        return b.rating - a.rating
+        return (b.rating || 0) - (a.rating || 0)
       case 'name':
         return a.name.localeCompare(b.name)
       case 'reviews':
-        return b.reviews - a.reviews
+        return (b.reviews || 0) - (a.reviews || 0)
       default:
         return 0
     }
@@ -196,7 +180,7 @@ export default function ProductsPage() {
     })
   }
 
-  const updateFilter = (key: keyof Filters, value: any) => {
+  const updateFilter = (key: keyof Filters, value: string | boolean | number[] | number) => {
     setFilters(prev => ({ ...prev, [key]: value }))
   }
 
@@ -495,7 +479,7 @@ export default function ProductsPage() {
                                 {[...Array(5)].map((_, i) => (
                                   <Star
                                     key={i}
-                                    className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-current' : 'text-gray-300'}`}
+                                    className={`h-4 w-4 ${i < Math.floor(product.rating || 0) ? 'fill-current' : 'text-gray-300'}`}
                                   />
                                 ))}
                               </div>
@@ -549,7 +533,7 @@ export default function ProductsPage() {
                                   {[...Array(5)].map((_, i) => (
                                     <Star
                                       key={i}
-                                      className={`h-3 w-3 ${i < Math.floor(product.rating) ? 'fill-current text-yellow-400' : 'text-gray-300'}`}
+                                      className={`h-3 w-3 ${i < Math.floor(product.rating || 0) ? 'fill-current text-yellow-400' : 'text-gray-300'}`}
                                     />
                                   ))}
                                 </div>
@@ -630,14 +614,23 @@ export default function ProductsPage() {
   )
 }
 
-function FilterPanel({ filters, categories, brands, priceRanges, updateFilter, clearFilters }: any) {
+type FilterPanelProps = {
+  filters: Filters;
+  categories: { name: string; count: number; }[];
+  brands: { name: string; count: number; }[];
+  priceRanges: { label: string; min: number; max: number; }[];
+  updateFilter: (key: keyof Filters, value: string | boolean | number[] | number) => void;
+  clearFilters: () => void;
+}
+
+function FilterPanel({ filters, categories, brands, priceRanges, updateFilter, clearFilters }: FilterPanelProps) {
   return (
     <div className="space-y-6">
       {/* Categories */}
       <div>
         <h3 className="font-medium text-gray-900 mb-3">Category</h3>
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {categories.map((category: any) => (
+          {categories.map((category: { name: string; count: number; }) => (
             <div key={category.name} className="flex items-center justify-between">
               <div className="flex items-center">
                 <Checkbox
@@ -663,7 +656,7 @@ function FilterPanel({ filters, categories, brands, priceRanges, updateFilter, c
       <div>
         <h3 className="font-medium text-gray-900 mb-3">Brand</h3>
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {brands.map((brand: any) => (
+          {brands.map((brand: { name: string; count: number; }) => (
             <div key={brand.name} className="flex items-center justify-between">
               <div className="flex items-center">
                 <Checkbox
@@ -702,7 +695,7 @@ function FilterPanel({ filters, categories, brands, priceRanges, updateFilter, c
           </div>
         </div>
         <div className="mt-3 space-y-2">
-          {priceRanges.map((range: any) => (
+          {priceRanges.map((range: { label: string; min: number; max: number; }) => (
             <Button
               key={range.label}
               variant="outline"

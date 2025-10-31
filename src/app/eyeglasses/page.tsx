@@ -32,6 +32,8 @@ export default function EyeglassesPage() {
     category: string;
     frameType?: string;
     lensType?: string;
+    material?: string;
+    isNew?: boolean;
   };
   const [eyeglasses, setEyeglasses] = useState<EyeglassesProduct[]>([])
   const [loading, setLoading] = useState(true)

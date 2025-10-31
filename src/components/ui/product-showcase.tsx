@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Heart, ShoppingCart, Star, Eye, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useStore } from "@/lib/store"
+import Image from "next/image"
 
 // Use the Product interface from the store
 interface Product {
@@ -94,9 +95,11 @@ export function ProductShowcase({ products, title, subtitle }: ProductShowcasePr
                 <div className="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
-                  <img
+                  <Image
                     src={product.image}
                     alt={product.name}
+                    width={400}
+                    height={320}
                     className={cn(
                       "w-full h-80 object-cover transition-transform duration-700",
                       hoveredProduct === product.id ? "scale-110" : "scale-100"

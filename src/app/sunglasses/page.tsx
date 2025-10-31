@@ -3,20 +3,21 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Search, Filter, Star, Sun, Shield } from 'lucide-react'
+import { Search, Filter, Star, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { useCart } from '@/lib/cart-context'
 import { useFavorites } from '@/lib/favorites-context'
+import { Product } from '@/types/product'
 
 export default function SunglassesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStyle, setSelectedStyle] = useState('all')
   const [selectedProtection, setSelectedProtection] = useState('all')
   const [sortBy, setSortBy] = useState('featured')
-  const [sunglasses, setSunglasses] = useState<any[]>([])
+  const [sunglasses, setSunglasses] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const { addToCart } = useCart()
   const { addToFavorites, isFavorite } = useFavorites()
@@ -49,7 +50,7 @@ export default function SunglassesPage() {
   }).sort((a, b) => {
     if (sortBy === 'price-low') return a.price - b.price
     if (sortBy === 'price-high') return b.price - a.price
-    if (sortBy === 'rating') return b.rating - a.rating
+    if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0)
     if (sortBy === 'name') return a.name.localeCompare(b.name)
     return 0
   })
@@ -168,13 +169,15 @@ export default function SunglassesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredSunglasses.map((glasses: any) => (
+            {filteredSunglasses.map((glasses: Product) => (
               <Card key={glasses.id} className="group hover:shadow-lg transition-all duration-300">
                 <CardContent className="p-0">
                   <div className="relative">
-                    <img
+                    <Image
                       src={glasses.image}
                       alt={glasses.name}
+                      width={300}
+                      height={192}
                       className="w-full h-48 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-300"
                     />
                     {glasses.discount && (

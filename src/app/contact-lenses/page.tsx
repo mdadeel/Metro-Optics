@@ -34,6 +34,8 @@ export default function ContactLensesPage() {
     inStock: boolean;
     category: string;
     color?: string;
+    isBestseller?: boolean;
+    packageSize?: number;
   };
   const [contactLenses, setContactLenses] = useState<ContactLens[]>([])
   const [loading, setLoading] = useState(true)

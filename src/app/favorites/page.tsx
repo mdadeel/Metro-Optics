@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useFavorites } from '@/lib/favorites-context'
 import { useCart } from '@/lib/cart-context'
+import { Product } from '@/types/product'
 
 export default function FavoritesPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -18,22 +19,6 @@ export default function FavoritesPage() {
   const [mounted, setMounted] = useState(false)
   const [sortBy, setSortBy] = useState('date')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  
-  type Product = {
-    id: number;
-    name: string;
-    brand: string;
-    price: number;
-    originalPrice?: number;
-    discount?: number;
-    rating: number;
-    reviews: number;
-    image: string;
-    category: string;
-    description?: string;
-    inStock: boolean;
-    [key: string]: unknown; // Allow additional properties
-  };
 
   const { favorites, addToFavorites, removeFromFavorites, isFavorite } = useFavorites()
   const { addToCart } = useCart()
@@ -64,22 +49,6 @@ export default function FavoritesPage() {
         return 0
     }
   })
-
-  type Product = {
-    id: number;
-    name: string;
-    brand: string;
-    price: number;
-    originalPrice?: number;
-    discount?: number;
-    rating: number;
-    reviews: number;
-    image: string;
-    category: string;
-    description?: string;
-    inStock: boolean;
-    [key: string]: unknown; // Allow additional properties
-  };
 
   const handleAddToCart = (product: Product) => {
     addToCart(product)
@@ -375,7 +344,7 @@ export default function FavoritesPage() {
                           className="absolute top-2 right-2 bg-white hover:bg-gray-100 text-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                           onClick={(e) => {
                             e.preventDefault()
-                            handleToggleFavorite(product)
+                            handleToggleFavorite(product as Product)
                           }}
                         >
                           <Heart className="h-4 w-4 fill-current" />
@@ -385,7 +354,7 @@ export default function FavoritesPage() {
                         <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                           {product.name}
                         </h3>
-                        <p className="text-sm text-gray-600 mb-2">{product.brand}</p>
+                        <p className="text-sm text-gray-600 mb-2">{product.brand || 'Brand N/A'}</p>
                         <div className="flex items-center mb-2">
                           <div className="flex text-yellow-400">
                             {[...Array(5)].map((_, i) => (
@@ -411,7 +380,7 @@ export default function FavoritesPage() {
                           <Button
                             onClick={(e) => {
                               e.preventDefault()
-                              handleAddToCart(product)
+                              handleAddToCart(product as Product)
                             }}
                             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                             size="sm"
@@ -421,7 +390,7 @@ export default function FavoritesPage() {
                           <Button
                             onClick={(e) => {
                               e.preventDefault()
-                              handleToggleFavorite(product)
+                              handleToggleFavorite(product as Product)
                             }}
                             variant="outline"
                             size="sm"
@@ -451,7 +420,7 @@ export default function FavoritesPage() {
                             </h3>
                           </Link>
                           <p className="text-gray-600 mb-2">{product.description}</p>
-                          <p className="text-sm text-gray-600 mb-3">{product.brand}</p>
+                          <p className="text-sm text-gray-600 mb-3">{product.brand || 'Brand N/A'}</p>
                           <div className="flex items-center mb-3">
                             <div className="flex text-yellow-400">
                               {[...Array(5)].map((_, i) => (
@@ -474,7 +443,7 @@ export default function FavoritesPage() {
                             </div>
                             <div className="flex gap-2">
                               <Button
-                                onClick={() => handleAddToCart(product)}
+                                onClick={() => handleAddToCart(product as Product)}
                                 className="bg-blue-600 hover:bg-blue-700 text-white"
                                 size="sm"
                               >
@@ -482,7 +451,7 @@ export default function FavoritesPage() {
                                 Add to Cart
                               </Button>
                               <Button
-                                onClick={() => handleToggleFavorite(product)}
+                                onClick={() => handleToggleFavorite(product as Product)}
                                 variant="outline"
                                 size="sm"
                                 className="border-red-500 text-red-500 hover:bg-red-50"

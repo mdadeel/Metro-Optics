@@ -130,6 +130,7 @@ const homepageData = {
   },
   services: {
     title: "Why Choose OpticaBD",
+    subtitle: "",
     enabled: true,
     services: [
       {
@@ -328,7 +329,7 @@ function HomepageManagementContent() {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => setEditingSection(homepageData.hero)}
+                    onClick={() => setEditingSection({ section: 'hero', data: homepageData.hero })}
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
@@ -371,7 +372,7 @@ function HomepageManagementContent() {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => setEditingSection(homepageData.featuredProducts)}
+                    onClick={() => setEditingSection({ section: 'products', data: homepageData.featuredProducts })}
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
@@ -413,7 +414,7 @@ function HomepageManagementContent() {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => setEditingSection(homepageData.categories)}
+                    onClick={() => setEditingSection({ section: 'categories', data: homepageData.categories })}
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
@@ -457,7 +458,7 @@ function HomepageManagementContent() {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => setEditingSection(homepageData.testimonials)}
+                      onClick={() => setEditingSection({ section: 'content', data: homepageData.testimonials })}
                     >
                       <Edit className="w-4 h-4 mr-2" />
                       Edit
@@ -499,7 +500,7 @@ function HomepageManagementContent() {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => setEditingSection(homepageData.services)}
+                      onClick={() => setEditingSection({ section: 'content', data: homepageData.services })}
                     >
                       <Edit className="w-4 h-4 mr-2" />
                       Edit
@@ -542,17 +543,17 @@ function HomepageManagementContent() {
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>
-                  Edit {activeTab === 'hero' ? 'Hero Section' : 
-                         activeTab === 'products' ? 'Featured Products' :
-                         activeTab === 'categories' ? 'Categories' : 'Content Section'}
+                  Edit {editingSection.section === 'hero' ? 'Hero Section' : 
+                         editingSection.section === 'products' ? 'Featured Products' :
+                         editingSection.section === 'categories' ? 'Categories' : 'Content Section'}
                 </DialogTitle>
               </DialogHeader>
-              {activeTab === 'hero' ? (
-                <HeroSectionForm data={editingSection} onClose={() => setEditingSection(null)} />
+              {editingSection.section === 'hero' ? (
+                <HeroSectionForm data={editingSection.data as HeroSection} onClose={() => setEditingSection(null)} />
               ) : (
                 <SectionForm 
-                  section={activeTab} 
-                  data={editingSection} 
+                  section={editingSection.section} 
+                  data={editingSection.data} 
                   onClose={() => setEditingSection(null)} 
                 />
               )}

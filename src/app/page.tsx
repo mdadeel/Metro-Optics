@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useCart } from '@/lib/cart-context'
 import { useFavorites } from '@/lib/favorites-context'
 import { useAuth } from '@/lib/auth-context'
+import { Product } from '@/types/product'
 import FeaturedProducts from '@/components/ui/featured-products'
 import { CategoryCardSkeleton, FeatureCardSkeleton } from '@/components/ui/skeleton-loader'
 import { EmptyStateWithLoading } from '@/components/ui/loading-states'
@@ -271,7 +272,7 @@ export default function HomePage() {
                       </div>
                     ) : searchResults.length > 0 ? (
                       <div className="py-2" role="presentation">
-                        {searchResults.map((product: { id: number; name: string; brand: string; price: number; originalPrice?: number; discount?: number; rating: number; reviews: number; image: string; description?: string; inStock: boolean; category: string }, index) => (
+                        {searchResults.map((product: Product, index) => (
                           <div
                             key={product.id}
                             data-search-result={index}
@@ -293,9 +294,11 @@ export default function HomePage() {
                             aria-selected={false}
                             className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center space-x-3 focus:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
                           >
-                            <img
+                            <Image
                               src={product.image}
                               alt={product.name}
+                              width={48}
+                              height={48}
                               className="w-12 h-12 object-cover rounded"
                               loading="lazy"
                             />
@@ -412,15 +415,17 @@ export default function HomePage() {
                     </div>
                   ) : searchResults.length > 0 ? (
                     <div className="py-2">
-                      {searchResults.map((product: any) => (
+                      {searchResults.map((product: Product) => (
                         <div
                           key={product.id}
                           onClick={() => handleProductClick(product.id)}
                           className="px-3 py-2 hover:bg-gray-50 cursor-pointer flex items-center space-x-2"
                         >
-                          <img
+                          <Image
                             src={product.image}
                             alt={product.name}
+                            width={40}
+                            height={40}
                             className="w-10 h-10 object-cover rounded"
                           />
                           <div className="flex-1">
@@ -488,15 +493,17 @@ export default function HomePage() {
                       </div>
                     ) : searchResults.length > 0 ? (
                       <div className="py-2">
-                        {searchResults.map((product: any) => (
+                        {searchResults.map((product: Product) => (
                           <div
                             key={product.id}
                             onClick={() => handleProductClick(product.id)}
                             className="px-3 py-2 hover:bg-gray-50 cursor-pointer flex items-center space-x-3 touch-manipulation"
                           >
-                            <img
+                            <Image
                               src={product.image}
                               alt={product.name}
+                              width={48}
+                              height={48}
                               className="w-12 h-12 object-cover rounded-lg"
                             />
                             <div className="flex-1 min-w-0">
@@ -1003,7 +1010,7 @@ export default function HomePage() {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <EmptyStateWithLoading loading={productsLoading} empty={products.length === 0}>
-              {products.map((product: any) => (
+              {products.map((product: Product) => (
                 <Card key={product.id} className="group hover:shadow-lg transition-all duration-300 border border-gray-200">
                   <Link href={`/products/${product.slug}`}>
                   <div className="relative">

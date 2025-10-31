@@ -27,23 +27,19 @@ interface ProductCardProps {
   isFavorite?: boolean
 }
 
-export function ProductCard({ 
+import { memo, useCallback } from "react";
+
+const ProductCard = memo(({ 
   product, 
   viewMode = "grid", 
-  onAddToCart, 
   onToggleFavorite, 
   isFavorite = false 
-}: ProductCardProps) {
+}: ProductCardProps) => {
   const [hovered, setHovered] = useState(false)
-  const [imageLoaded, setImageLoaded] = useState(false)
 
-  const handleAddToCart = () => {
-    if (onAddToCart) onAddToCart()
-  }
-
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = useCallback(() => {
     if (onToggleFavorite) onToggleFavorite()
-  }
+  }, [onToggleFavorite])
 
   if (viewMode === "list") {
     return (
@@ -58,7 +54,7 @@ export function ProductCard({
                 "object-cover transition-transform duration-700",
                 hovered ? "scale-110" : "scale-100"
               )}
-              onLoad={() => setImageLoaded(true)}
+
             />
             
             {product.badge && (
@@ -161,7 +157,7 @@ export function ProductCard({
               "object-cover transition-transform duration-700",
               hovered ? "scale-110" : "scale-100"
             )}
-            onLoad={() => setImageLoaded(true)}
+
           />
           
           {/* Badge */}
@@ -214,15 +210,10 @@ export function ProductCard({
           {/* Rating */}
           <div className="flex items-center gap-2">
             <div className="flex items-center">
-              {[...Array(5)].map((_, i) => (
+              {Array.from({ length: 5 }, (_, i) => (
                 <Star 
                   key={i} 
-                  className={cn(
-                    "w-4 h-4",
-                    i < Math.floor(product.rating) 
-                      ? "text-yellow-400 fill-current" 
-                      : "text-gray-300"
-                  )} 
+                  className={`w-4 h-4 ${i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
                 />
               ))}
             </div>
@@ -252,4 +243,8 @@ export function ProductCard({
       </GlassCard>
     </div>
   )
-}
+});
+
+ProductCard.displayName = 'ProductCard';
+
+export { ProductCard };

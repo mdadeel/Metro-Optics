@@ -1,6 +1,6 @@
 'use client'
 
-import { Loader2, RefreshCw } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 // Full page loading spinner
@@ -90,7 +90,7 @@ export function LoadingButton({
   children: React.ReactNode
   loading: boolean
   className?: string
-  [key: string]: any 
+  [key: string]: unknown
 }) {
   return (
     <button 

@@ -1,13 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import type { Product } from '@/types/product'
 
-interface ProductsResponse {
-  products: Product[]
-  total: number
-  page: number
-  limit: number
-}
-
 // API functions
 const fetchProducts = async (params?: {
   category?: string
