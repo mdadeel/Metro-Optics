@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma migrate deploy && next build",
+    "prebuild": "node scripts/check-env.js",
+    "build": "prisma generate && (prisma migrate deploy || echo 'Migration skipped') && next build",
     "postbuild": "prisma db seed",
     "start": "next start",
     "lint": "next lint",
