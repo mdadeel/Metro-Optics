@@ -127,12 +127,12 @@ function checkEnvironmentVariables() {
 
     console.error('\n📝 To fix:');
     if (isVercel) {
-      console.error('  This is a Vercel build. Set DATABASE_URL in:');
+      console.error('  This is a Vercel build. Set Firebase config in:');
       console.error('  Vercel Dashboard → Your Project → Settings → Environment Variables');
-      console.error('  Add: DATABASE_URL = postgresql://... (PostgreSQL connection string)');
+      console.error('  Add: NEXT_PUBLIC_FIREBASE_PROJECT_ID = your-project-id');
       console.error('  Make sure to select the correct environment (Production/Preview/Development)');
     } else {
-      console.error('  1. For local development: Create .env.local file with DATABASE_URL');
+      console.error('  1. For local development: Create .env.local file with Firebase config');
       console.error('  2. For Vercel: Go to Settings → Environment Variables');
       console.error('  3. See VERCEL_DEPLOYMENT_GUIDE.md for detailed instructions');
     }

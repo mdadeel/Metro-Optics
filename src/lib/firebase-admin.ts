@@ -36,20 +36,20 @@ function initializeFirebaseAdmin() {
       })
       db = getFirestore(firebaseAdminApp)
       return firebaseAdminApp
-    } catch (error) {
-      // If Application Default Credentials fail, try without explicit projectId
-      // Firebase Admin will try to infer from environment
-      try {
-        firebaseAdminApp = initializeApp()
-        db = getFirestore(firebaseAdminApp)
-        return firebaseAdminApp
-      } catch (fallbackError) {
-        console.error('Firebase Admin initialization error:', fallbackError)
-        // Don't throw - allow graceful degradation
-        // The app will fail on first database operation if this doesn't work
-        throw new Error('Firebase Admin SDK initialization failed. Please set FIREBASE_SERVICE_ACCOUNT_KEY or configure Application Default Credentials.')
+      } catch {
+        // If Application Default Credentials fail, try without explicit projectId
+        // Firebase Admin will try to infer from environment
+        try {
+          firebaseAdminApp = initializeApp()
+          db = getFirestore(firebaseAdminApp)
+          return firebaseAdminApp
+        } catch (fallbackError) {
+          console.error('Firebase Admin initialization error:', fallbackError)
+          // Don't throw - allow graceful degradation
+          // The app will fail on first database operation if this doesn't work
+          throw new Error('Firebase Admin SDK initialization failed. Please set FIREBASE_SERVICE_ACCOUNT_KEY or configure Application Default Credentials.')
+        }
       }
-    }
   }
 
   // If service account key is provided as JSON string

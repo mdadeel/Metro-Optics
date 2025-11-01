@@ -1,11 +1,8 @@
 // Firebase Firestore database wrapper
 // This file replaces Prisma and provides a similar interface for Firestore
-import { getDb, Firestore } from './firebase-admin'
+import { getDb } from './firebase-admin'
 import { 
-  CollectionReference, 
-  Query, 
-  DocumentData,
-  WhereFilterOp,
+  Query,
   OrderByDirection 
 } from 'firebase-admin/firestore'
 
@@ -40,14 +37,14 @@ export const db = {
       return null
     },
     
-    findFirst: async (args?: { where?: any }) => {
+    findFirst: async (args?: { where?: Record<string, unknown> }) => {
       const firestore = getDb()
       const collectionRef = firestore.collection(collections.users)
-      let query: Query = collectionRef as any
+      let query: Query = collectionRef as Query
       
       if (args?.where) {
         Object.entries(args.where).forEach(([field, value]) => {
-          query = query.where(field, '==', value) as any
+          query = query.where(field, '==', value) as Query
         })
       }
       
@@ -57,7 +54,7 @@ export const db = {
       return { id: doc.id, ...doc.data() }
     },
     
-    create: async (args: { data: any }) => {
+    create: async (args: { data: Record<string, unknown> }) => {
       const firestore = getDb()
       const docRef = firestore.collection(collections.users).doc()
       const data = {
@@ -69,7 +66,7 @@ export const db = {
       return { id: docRef.id, ...data }
     },
     
-    update: async (args: { where: { id: string }; data: any }) => {
+    update: async (args: { where: { id: string }; data: Record<string, unknown> }) => {
       const firestore = getDb()
       const docRef = firestore.collection(collections.users).doc(args.where.id)
       const data = {
@@ -85,15 +82,15 @@ export const db = {
   // Products collection
   product: {
     findMany: async (args?: { 
-      where?: any; 
-      orderBy?: any;
+      where?: Record<string, unknown> & { OR?: Array<Record<string, unknown>> }; 
+      orderBy?: Record<string, 'asc' | 'desc'>;
       take?: number;
     }) => {
       const firestore = getDb()
       const collectionRef = firestore.collection(collections.products)
       
       // Fetch all products first for complex filtering (OR conditions, multiple filters)
-      let products: any[] = []
+      let products: Array<Record<string, unknown> & { id: string }> = []
       
       try {
         // If we have OR conditions or complex filters, fetch all and filter in memory
@@ -102,38 +99,38 @@ export const db = {
           products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
         } else {
           // Build query for simple filters
-          let query: Query = collectionRef as any
+          let query: Query = collectionRef as Query
           let hasFilter = false
           
           if (args?.where) {
             const whereClause = args.where
             
             if (whereClause.category) {
-              query = query.where('category', '==', whereClause.category) as any
+              query = query.where('category', '==', whereClause.category) as Query
               hasFilter = true
             }
             if (whereClause.brand) {
-              query = query.where('brand', '==', whereClause.brand) as any
+              query = query.where('brand', '==', whereClause.brand) as Query
               hasFilter = true
             }
             if (whereClause.price?.gte) {
-              query = query.where('price', '>=', whereClause.price.gte) as any
+              query = query.where('price', '>=', whereClause.price.gte) as Query
               hasFilter = true
             }
             if (whereClause.price?.lte) {
-              query = query.where('price', '<=', whereClause.price.lte) as any
+              query = query.where('price', '<=', whereClause.price.lte) as Query
               hasFilter = true
             }
             if (whereClause.rating?.gte) {
-              query = query.where('rating', '>=', whereClause.rating.gte) as any
+              query = query.where('rating', '>=', whereClause.rating.gte) as Query
               hasFilter = true
             }
             if (whereClause.stock?.gt !== undefined) {
-              query = query.where('stock', '>', whereClause.stock.gt) as any
+              query = query.where('stock', '>', whereClause.stock.gt) as Query
               hasFilter = true
             }
             if (whereClause.slug) {
-              query = query.where('slug', '==', whereClause.slug) as any
+              query = query.where('slug', '==', whereClause.slug) as Query
               hasFilter = true
             }
           }
@@ -142,12 +139,12 @@ export const db = {
           if (args?.orderBy) {
             const orderByKey = Object.keys(args.orderBy)[0]
             const orderByDirection = args.orderBy[orderByKey] === 'desc' ? 'desc' : 'asc'
-            query = query.orderBy(orderByKey, orderByDirection as OrderByDirection) as any
+            query = query.orderBy(orderByKey, orderByDirection as OrderByDirection) as Query
           }
           
           // Apply limit
           if (args?.take) {
-            query = query.limit(args.take) as any
+            query = query.limit(args.take) as Query
           }
           
           const snapshot = hasFilter || args?.orderBy ? await query.get() : await collectionRef.get()
@@ -161,15 +158,20 @@ export const db = {
           // Handle OR conditions
           if (whereClause.OR && Array.isArray(whereClause.OR)) {
             products = products.filter(product => {
-              return whereClause.OR.some((condition: any) => {
-                if (condition.badge?.not === null || condition.badge?.not === undefined) {
-                  return product.badge != null
+              return whereClause.OR.some((condition: Record<string, unknown>) => {
+                if (condition.badge && typeof condition.badge === 'object' && ('not' in condition.badge)) {
+                  const badgeCondition = condition.badge as { not?: null }
+                  if (badgeCondition.not === null || badgeCondition.not === undefined) {
+                    return product.badge != null
+                  }
                 }
-                if (condition.rating?.gte) {
-                  return (product.rating || 0) >= condition.rating.gte
+                if (condition.rating && typeof condition.rating === 'object' && 'gte' in condition.rating) {
+                  const ratingCondition = condition.rating as { gte: number }
+                  return (Number(product.rating) || 0) >= ratingCondition.gte
                 }
-                if (condition.reviews?.gt) {
-                  return (product.reviews || 0) > condition.reviews.gt
+                if (condition.reviews && typeof condition.reviews === 'object' && 'gt' in condition.reviews) {
+                  const reviewsCondition = condition.reviews as { gt: number }
+                  return (Number(product.reviews) || 0) > reviewsCondition.gt
                 }
                 return false
               })
@@ -177,23 +179,33 @@ export const db = {
           }
           
           // Apply additional filters in memory if not already applied
-          if (whereClause.category && !products.every((p: any) => p.category === whereClause.category)) {
-            products = products.filter((p: any) => p.category === whereClause.category)
+          if (whereClause.category && typeof whereClause.category === 'string') {
+            const categoryValue = whereClause.category
+            if (!products.every((p) => p.category === categoryValue)) {
+              products = products.filter((p) => p.category === categoryValue)
+            }
           }
-          if (whereClause.brand && !products.every((p: any) => p.brand === whereClause.brand)) {
-            products = products.filter((p: any) => p.brand === whereClause.brand)
+          if (whereClause.brand && typeof whereClause.brand === 'string') {
+            const brandValue = whereClause.brand
+            if (!products.every((p) => p.brand === brandValue)) {
+              products = products.filter((p) => p.brand === brandValue)
+            }
           }
-          if (whereClause.price?.gte) {
-            products = products.filter((p: any) => (p.price || 0) >= whereClause.price.gte)
+          if (whereClause.price && typeof whereClause.price === 'object' && 'gte' in whereClause.price) {
+            const minPrice = Number((whereClause.price as { gte: number }).gte)
+            products = products.filter((p) => (Number(p.price) || 0) >= minPrice)
           }
-          if (whereClause.price?.lte) {
-            products = products.filter((p: any) => (p.price || 0) <= whereClause.price.lte)
+          if (whereClause.price && typeof whereClause.price === 'object' && 'lte' in whereClause.price) {
+            const maxPrice = Number((whereClause.price as { lte: number }).lte)
+            products = products.filter((p) => (Number(p.price) || 0) <= maxPrice)
           }
-          if (whereClause.rating?.gte) {
-            products = products.filter((p: any) => (p.rating || 0) >= whereClause.rating.gte)
+          if (whereClause.rating && typeof whereClause.rating === 'object' && 'gte' in whereClause.rating) {
+            const minRating = Number((whereClause.rating as { gte: number }).gte)
+            products = products.filter((p) => (Number(p.rating) || 0) >= minRating)
           }
-          if (whereClause.stock?.gt !== undefined) {
-            products = products.filter((p: any) => (p.stock || 0) > whereClause.stock.gt)
+          if (whereClause.stock && typeof whereClause.stock === 'object' && 'gt' in whereClause.stock) {
+            const stockValue = Number((whereClause.stock as { gt: number }).gt)
+            products = products.filter((p) => (Number(p.stock) || 0) > stockValue)
           }
         }
         
@@ -221,9 +233,9 @@ export const db = {
       return products
     },
     
-    findFirst: async (args: { where?: any }) => {
+    findFirst: async (args: { where?: Record<string, unknown> & { OR?: Array<Record<string, unknown>> } }) => {
       const firestore = getDb()
-      let query: Query = firestore.collection(collections.products) as any
+      let query: Query = firestore.collection(collections.products) as Query
       
       if (args.where) {
         if (args.where.OR) {
@@ -231,7 +243,7 @@ export const db = {
           const conditions = args.where.OR
           for (const condition of conditions) {
             if (condition.slug) {
-              query = query.where('slug', '==', condition.slug) as any
+              query = query.where('slug', '==', condition.slug) as Query
               break
             }
             if (condition.id) {
@@ -241,16 +253,16 @@ export const db = {
                 if (doc.exists) {
                   return { id: doc.id, ...doc.data() }
                 }
-              } catch (e) {
+              } catch {
                 // Fall through to query
               }
-              query = query.where('__name__', '==', condition.id) as any
+              query = query.where('__name__', '==', condition.id) as Query
               break
             }
           }
         } else {
           if (args.where.slug) {
-            query = query.where('slug', '==', args.where.slug) as any
+            query = query.where('slug', '==', args.where.slug) as Query
           }
           if (args.where.id) {
             const doc = await firestore.collection(collections.products).doc(args.where.id).get()
@@ -286,7 +298,7 @@ export const db = {
       return null
     },
     
-    create: async (args: { data: any }) => {
+    create: async (args: { data: Record<string, unknown> }) => {
       const firestore = getDb()
       const docRef = firestore.collection(collections.products).doc()
       const data = {
