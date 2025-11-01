@@ -9,10 +9,13 @@
     "postbuild": "prisma db seed",
     "start": "next start",
     "lint": "next lint",
+    "setup": "node scripts/update-env.js",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
+    "db:seed": "prisma db seed",
+    "db:setup": "./scripts/setup-database.sh",
     "create-admin": "tsx scripts/create-admin.ts"
   },
   "prisma": {
