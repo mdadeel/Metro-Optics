@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useFeaturedProducts, useSearchProducts } from '@/hooks/use-products'
 import { Search, ShoppingCart, User, Menu, X, ChevronDown, Star, Truck, Shield, RefreshCw, ArrowRight, Sparkles, TrendingUp, Package, Eye, Glasses, MapPin, Phone, Mail, Sun, Eye as ContactIcon, Baby } from 'lucide-react'
 import Link from 'next/link'
@@ -18,6 +19,7 @@ import { getPlaceholderUrl } from '@/lib/image-generator'
 import { generateAriaLabel, handleKeyboardNavigation } from '@/lib/accessibility'
 
 export default function HomePage() {
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchFocused, setIsSearchFocused] = useState(false)
@@ -54,15 +56,16 @@ export default function HomePage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      // Redirect to search results page
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`
+      // Use Next.js router for client-side navigation
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
     }
   }
 
-  const handleProductClick = (productId: number) => {
+  const handleProductClick = (productId: number | string) => {
     setShowSearchResults(false)
     setSearchQuery('')
-    window.location.href = `/products/${productId}`
+    // Use Next.js router for client-side navigation
+    router.push(`/products/${productId}`)
   }
 
   
