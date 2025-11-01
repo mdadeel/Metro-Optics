@@ -55,10 +55,19 @@ prisma/*.db
 prisma/dev.db
 prisma/custom.db
 
-# documentation (optional - uncomment if you don't want docs in git)
-# BUG_DETECTION_PLAN.md
-# DEBUGGING_GUIDE.md
-# FIXES_APPLIED.md
+# documentation and temporary files (security audits, debugging guides, etc.)
+BUG_DETECTION_PLAN.md
+DEBUGGING_GUIDE.md
+FIXES_APPLIED.md
+GIT_CLEANUP_GUIDE.md
+GIT_IGNORE_UPDATE.md
+PRODUCTS_ISSUE_DIAGNOSIS.md
+PRODUCTS_FIX_SUMMARY.md
+SECURITY_*.md
+FINAL_SECURITY_STATUS.md
+SECURITY_COMPLETION_REPORT.md
+SECURITY_IMPLEMENTATION_STATUS.md
+cleanup-git.sh
 
 # test files
 test/

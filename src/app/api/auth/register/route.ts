@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     // Create user session (don't include password)
     const userSession = {
       id: newUser.id,
-      name: newUser.name,
+      name: newUser.name || '',
       email: newUser.email,
       role: newUser.role,
       phone: newUser.phone || undefined,

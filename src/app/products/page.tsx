@@ -43,7 +43,7 @@ export default function ProductsPage() {
     brand: '',
     priceRange: [0, 5000],
     rating: 0,
-    inStock: true,
+    inStock: false, // Changed to false by default - show all products
     sortBy: 'featured'
   })
 
@@ -67,11 +67,34 @@ export default function ProductsPage() {
         const response = await fetch(`/api/products?${queryParams.toString()}`, {
           credentials: 'include'
         })
-        if (response.ok) {
-          const data = await response.json()
-          setProducts(data)
-          setTotalPages(Math.ceil(data.length / 12))
+        
+        if (!response.ok) {
+          // Handle error responses
+          const errorData = await response.json().catch(() => ({}))
+          console.error('Products API error:', errorData)
+          setProducts([])
+          setTotalPages(0)
+          return
         }
+        
+        const data = await response.json()
+        
+        // Handle both array response and error response format
+        if (data.error) {
+          console.error('Products API returned error:', data.message || data.error)
+          setProducts(data.products || [])
+        } else if (Array.isArray(data)) {
+          setProducts(data)
+        } else if (data.products && Array.isArray(data.products)) {
+          setProducts(data.products)
+        } else {
+          console.error('Unexpected API response format:', data)
+          setProducts([])
+        }
+        
+        const productCount = Array.isArray(data) ? data.length : (data.products?.length || 0)
+        console.log(`[Products Page] Received ${productCount} products`)
+        setTotalPages(Math.ceil(productCount / 12))
       } catch (error) {
         console.error('Failed to fetch products:', error)
       } finally {
@@ -175,7 +198,7 @@ export default function ProductsPage() {
       brand: '',
       priceRange: [0, 5000],
       rating: 0,
-      inStock: true,
+      inStock: false, // Show all products
       sortBy: 'featured'
     })
   }

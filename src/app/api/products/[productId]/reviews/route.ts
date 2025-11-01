@@ -211,7 +211,7 @@ export async function POST(request: NextRequest, { params }: { params: { product
     const newReview = {
       id: mockReviews.length + 1,
       productId: product.id,
-      userId: userSession.id,
+      userId: typeof userSession.id === 'number' ? userSession.id : parseInt(String(userSession.id).replace(/\D/g, '')) || 1,
       userName: userName,
       rating: rating,
       title: sanitizedTitle,

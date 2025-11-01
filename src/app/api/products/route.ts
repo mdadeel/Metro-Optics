@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { Product } from '@prisma/client';
+import { Product, Prisma } from '@prisma/client';
 
 // Helper function to generate slugs
 function generateSlug(name: string): string {
@@ -11,17 +11,14 @@ function generateSlug(name: string): string {
 }
 
 // Helper function to get sort options
-function getSortOption(sortBy: string | null) {
+function getSortOption(sortBy: string | null): { rating: 'desc' } | { reviews: 'desc' } | { price: 'asc' | 'desc' } | { name: 'asc' } {
   switch (sortBy) {
     case 'price-low': return { price: 'asc' as const }
     case 'price-high': return { price: 'desc' as const }
     case 'rating': return { rating: 'desc' as const }
     case 'name': return { name: 'asc' as const }
     case 'reviews': return { reviews: 'desc' as const }
-    default: return [
-      { rating: 'desc' as const },
-      { reviews: 'desc' as const }
-    ]
+    default: return { rating: 'desc' as const }
   }
 }
 
@@ -42,32 +39,44 @@ export async function GET(request: NextRequest) {
     let products: Product[] = []
     
     try {
+      // Build where clause (excluding search, we'll filter that in memory for SQLite compatibility)
+      const whereClause: Prisma.ProductWhereInput = {
+        ...(category && { category }),
+        ...(brand && { brand }),
+        ...(minPrice && { price: { gte: parseFloat(minPrice) } }),
+        ...(maxPrice && { price: { lte: parseFloat(maxPrice) } }),
+        ...(rating && { rating: { gte: parseFloat(rating) } }),
+        ...(inStock === 'true' && { stock: { gt: 0 } }),
+        ...(featured === 'true' && {
+          OR: [
+            { badge: { not: null } },
+            { rating: { gte: 4.5 } },
+            { reviews: { gt: 100 } }
+          ]
+        })
+      }
+
+      // Fetch products from database
       products = await db.product.findMany({ 
-        where: {
-          ...(category && { category }),
-          ...(brand && { brand }),
-          ...(minPrice && { price: { gte: parseFloat(minPrice) } }),
-          ...(maxPrice && { price: { lte: parseFloat(maxPrice) } }),
-          ...(rating && { rating: { gte: parseFloat(rating) } }),
-          ...(inStock === 'true' && { stock: { gt: 0 } }),
-          ...(search && {
-            OR: [
-              { name: { contains: search } },
-              { brand: { contains: search } },
-              { description: { contains: search } }
-            ]
-          }),
-          ...(featured === 'true' && {
-            OR: [
-              { badge: { not: null } },
-              { rating: { gte: 4.5 } },
-              { reviews: { gt: 100 } }
-            ]
-          })
-        },
+        where: whereClause,
         orderBy: getSortOption(sortBy), 
-        take: limit ? parseInt(limit) : undefined
       })
+
+      // Apply search filter in memory (SQLite doesn't support case-insensitive contains well)
+      if (search) {
+        const searchLower = search.toLowerCase()
+        products = products.filter(product => {
+          const nameMatch = product.name.toLowerCase().includes(searchLower)
+          const brandMatch = product.brand?.toLowerCase().includes(searchLower) || false
+          const descMatch = product.description.toLowerCase().includes(searchLower)
+          return nameMatch || brandMatch || descMatch
+        })
+      }
+
+      // Apply limit after filtering
+      if (limit) {
+        products = products.slice(0, parseInt(limit))
+      }
     } catch (dbError) {
       console.error('Database error in products API:', dbError)
       // Log detailed error for debugging
