@@ -70,20 +70,34 @@ export async function GET(request: NextRequest) {
       })
     } catch (dbError) {
       console.error('Database error in products API:', dbError)
-      // Return empty array instead of throwing error to prevent 500
-      return NextResponse.json([], {
-        headers: {
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
-          'CDN-Cache-Control': 'public, s-maxage=300',
-          'Vercel-CDN-Cache-Control': 'public, s-maxage=300'
+      // Log detailed error for debugging
+      const errorMessage = dbError instanceof Error ? dbError.message : 'Unknown database error'
+      const errorStack = dbError instanceof Error ? dbError.stack : undefined
+      console.error('Database error details:', { errorMessage, errorStack })
+      
+      // Return error response with details for debugging (in production, you may want to hide details)
+      return NextResponse.json(
+        { 
+          error: 'Database connection failed',
+          message: process.env.NODE_ENV === 'development' ? errorMessage : 'Failed to fetch products',
+          products: [] // Return empty array for backward compatibility
+        },
+        { 
+          status: 503, // Service Unavailable
+          headers: {
+            'Cache-Control': 'no-cache',
+          }
         }
-      })
+      )
     }
+
+    // Log product count for debugging
+    console.log(`[Products API] Found ${products.length} products`)
 
     // Transform products to include a single image field and slug for frontend compatibility
     const transformedProducts = products.map(product => ({
       ...product,
-      slug: generateSlug(product.name),
+      slug: product.slug || generateSlug(product.name),
       image: Array.isArray(product.images) && product.images.length > 0 
         ? product.images[0] 
         : null,

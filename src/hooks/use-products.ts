@@ -9,6 +9,7 @@ const fetchProducts = async (params?: {
   maxPrice?: number
   limit?: number
   search?: string
+  featured?: boolean
 }): Promise<Product[]> => {
   const searchParams = new URLSearchParams()
   
@@ -18,12 +19,24 @@ const fetchProducts = async (params?: {
   if (params?.maxPrice) searchParams.append('maxPrice', params.maxPrice.toString())
   if (params?.limit) searchParams.append('limit', params.limit.toString())
   if (params?.search) searchParams.append('search', params.search)
+  if (params?.featured) searchParams.append('featured', 'true')
 
   const response = await fetch(`/api/products?${searchParams.toString()}`)
   if (!response.ok) {
-    throw new Error('Failed to fetch products')
+    const errorData = await response.json().catch(() => ({}))
+    const errorMessage = errorData.message || errorData.error || 'Failed to fetch products'
+    console.error('Products API error:', errorMessage, { status: response.status })
+    throw new Error(errorMessage)
   }
-  return response.json()
+  
+  const data = await response.json()
+  // Handle error response format (when API returns { error, products: [] })
+  if (data.error && !Array.isArray(data)) {
+    console.error('Products API returned error:', data.message || data.error)
+    return data.products || []
+  }
+  
+  return Array.isArray(data) ? data : data.products || []
 }
 
 const fetchProduct = async (slug: string): Promise<Product> => {
@@ -81,8 +94,28 @@ export const useSearchProducts = (query: string, enabled: boolean = true) => {
 export const useFeaturedProducts = () => {
   return useQuery({
     queryKey: ['products', 'featured'],
-    queryFn: () => fetchProducts({ limit: 8 }),
+    queryFn: async () => {
+      // Try featured endpoint first
+      try {
+        const response = await fetch('/api/products?featured=true&limit=8')
+        if (!response.ok) {
+          throw new Error('Failed to fetch featured products')
+        }
+        const data = await response.json()
+        // Handle error response format
+        if (data.error) {
+          console.error('Featured products API error:', data.message || data.error)
+          return []
+        }
+        return Array.isArray(data) ? data : data.products || []
+      } catch (error) {
+        console.error('Featured products fetch error:', error)
+        // Fallback to regular products
+        return fetchProducts({ limit: 8 })
+      }
+    },
     staleTime: 10 * 60 * 1000, // 10 minutes
+    retry: 2, // Retry failed requests
   })
 }
 

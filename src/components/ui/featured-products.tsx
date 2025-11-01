@@ -87,19 +87,53 @@ export default function FeaturedProducts() {
   }
 
   if (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const isDatabaseError = errorMessage.includes('Database') || errorMessage.includes('Failed to fetch products')
+    
     return (
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ErrorBoundary error={error as Error}>
             <EmptyState
-              title="Failed to load products"
-              description="We couldn't load the featured products. Please try again later."
+              title={isDatabaseError ? "Database Connection Issue" : "Failed to load products"}
+              description={
+                isDatabaseError 
+                  ? "We're experiencing database connectivity issues. Please check your database configuration or try again later."
+                  : "We couldn't load the featured products. Please try again later."
+              }
               action={{
                 label: "Refresh Page",
                 onClick: () => window.location.reload()
               }}
             />
           </ErrorBoundary>
+        </div>
+      </section>
+    )
+  }
+
+  // Check if products array is empty due to database issues
+  if (products.length === 0 && !loading && !error) {
+    return (
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center py-12">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No products available</h3>
+            <p className="text-gray-600 mb-4">
+              It looks like there are no products in the database. Please check:
+            </p>
+            <ul className="text-left max-w-md mx-auto text-sm text-gray-600 mb-6 space-y-2">
+              <li>• Database connection is properly configured</li>
+              <li>• Database has been seeded with products</li>
+              <li>• DATABASE_URL environment variable is set correctly</li>
+            </ul>
+            <Button 
+              onClick={() => window.location.reload()}
+              variant="outline"
+            >
+              Refresh Page
+            </Button>
+          </div>
         </div>
       </section>
     )

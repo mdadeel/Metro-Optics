@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import glassesData from '@/data/glasses.json'
+import { db } from '@/lib/db'
 
 function generateSlug(name: string): string {
   return name
@@ -39,11 +39,36 @@ export async function GET(request: NextRequest) {
     const validatedParams = searchSchema.parse(params)
     
     // Use the same product data as the main API
-    const allProducts = glassesData.products.map(product => ({
-      ...product,
-      slug: generateSlug(product.name),
-      inStock: true // Add stock status
-    }))
+    let allProducts;
+    try {
+      const dbProducts = await db.product.findMany();
+      console.log(`[Search API] Found ${dbProducts.length} products in database`);
+      allProducts = dbProducts.map(product => ({
+        ...product,
+        slug: product.slug || generateSlug(product.name),
+        inStock: product.stock > 0,
+        image: Array.isArray(product.images) && product.images.length > 0 
+          ? product.images[0] 
+          : null,
+      }));
+    } catch (dbError) {
+      console.error('Database error in search API:', dbError);
+      const errorMessage = dbError instanceof Error ? dbError.message : 'Unknown database error'
+      console.error('Search API database error details:', { errorMessage, errorStack: dbError instanceof Error ? dbError.stack : undefined })
+      return NextResponse.json(
+        { 
+          error: 'Database connection failed',
+          message: process.env.NODE_ENV === 'development' ? errorMessage : 'Failed to search products',
+          products: [],
+          pagination: { currentPage: 1, totalPages: 0, totalResults: 0, hasNextPage: false, hasPreviousPage: false },
+          filters: {},
+          suggestions: [],
+          categories: [],
+          brands: []
+        },
+        { status: 503 }
+      );
+    }
     
     // Filter products based on search criteria
     const filteredProducts = allProducts.filter(product => {
@@ -140,7 +165,7 @@ export async function GET(request: NextRequest) {
     
     console.error('Search error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     )
   }

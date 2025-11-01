@@ -50,3 +50,59 @@ server.log
 
 # databases
 *.db
+db/
+prisma/*.db
+prisma/dev.db
+prisma/custom.db
+
+# documentation (optional - uncomment if you don't want docs in git)
+# BUG_DETECTION_PLAN.md
+# DEBUGGING_GUIDE.md
+# FIXES_APPLIED.md
+
+# test files
+test/
+*.test.ts
+*.spec.ts
+*.test.tsx
+*.spec.tsx
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# temporary files
+*.tmp
+*.temp
+.cache/
+tmp/
+temp/
+
+# build artifacts
+dist/
+build/
+*.tsbuildinfo
+
+# coverage reports
+coverage/
+.nyc_output/
+*.lcov
+
+# prisma generated client (keep migrations, they're source code)
+node_modules/.prisma/
