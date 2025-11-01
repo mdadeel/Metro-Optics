@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -81,11 +82,13 @@ function DefaultErrorFallback({ error, reset }: { error?: Error; reset: () => vo
             </Button>
             <Button 
               variant="outline" 
-              onClick={() => window.location.href = '/'}
+              asChild
               className="flex items-center gap-2"
             >
-              <Home className="w-4 h-4" />
-              Go Home
+              <Link href="/">
+                <Home className="w-4 h-4" />
+                Go Home
+              </Link>
             </Button>
           </div>
         </CardContent>

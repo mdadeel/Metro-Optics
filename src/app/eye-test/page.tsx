@@ -81,7 +81,7 @@ export default function EyeTestPage() {
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Free Eye Testing</h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Professional eye examination by certified optometrists at our Dhanmondi showroom
+            Professional eye examination by certified optometrists at our Chittagong showroom
           </p>
           <div className="flex justify-center gap-4 mt-6">
             <Badge className="bg-green-100 text-green-800 px-4 py-2">

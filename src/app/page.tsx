@@ -1120,7 +1120,7 @@ export default function HomePage() {
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-600/20 rounded-lg flex items-center justify-center">
                     <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-blue-400" />
                   </div>
-                  <span className="text-xs sm:text-sm">Shop 12, Block C, Dhanmondi, Dhaka-1205</span>
+                  <span className="text-xs sm:text-sm">Majhar Gate, Agrabad, Chittagong</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-300">
                   <div className="w-8 h-8 bg-green-600/20 rounded-lg flex items-center justify-center">

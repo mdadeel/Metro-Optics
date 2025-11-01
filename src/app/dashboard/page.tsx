@@ -184,7 +184,7 @@ export default function Dashboard() {
       id: 1,
       type: 'Home',
       name: 'Rahman Ahmed',
-      address: 'House 12, Road 8, Dhanmondi',
+      address: 'Majhar Gate, Agrabad, Chittagong',
       city: 'Dhaka',
       postalCode: '1205',
       phone: '+880 1712-345678',

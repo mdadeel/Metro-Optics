@@ -101,7 +101,7 @@ export default function ContactPage() {
               {
                 icon: MapPin,
                 title: 'Visit Us',
-                info: ['Dhanmondi, Dhaka-1205', 'Banani, Dhaka-1213'],
+                info: ['Majhar Gate, Agrabad, Chittagong', 'Banani, Dhaka-1213'],
                 description: 'Showrooms open 10 AM - 8 PM',
                 color: 'from-purple-500 to-pink-600'
               }
@@ -269,8 +269,8 @@ export default function ContactPage() {
               <div className="space-y-4">
                 {[
                   {
-                    title: 'Dhanmondi Showroom',
-                    address: 'Road 8, Dhanmondi, Dhaka-1205',
+                    title: 'Chittagong Showroom',
+                    address: 'Majhar Gate, Agrabad, Chittagong',
                     hours: '10:00 AM - 8:00 PM',
                     phone: '+880 1234-567890'
                   },

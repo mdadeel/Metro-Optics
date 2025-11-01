@@ -47,8 +47,8 @@ const shippingOptions = [
 
 const deliveryAreas = [
   {
-    city: 'Dhaka',
-    areas: ['Dhanmondi', 'Gulshan', 'Banani', 'Uttara', 'Mirpur', 'Wari', 'Old Dhaka'],
+    city: 'Chittagong',
+    areas: ['Agrabad', 'Nasirabad', 'GEC Circle', 'New Market', 'Kotwali', 'Pahartali', 'Hali Shohor'],
     deliveryTime: '1-2 days',
     status: 'Available'
   },
