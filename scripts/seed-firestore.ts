@@ -1,38 +1,45 @@
-import { PrismaClient } from '@prisma/client'
+import { db } from '../src/lib/db'
 import glassesData from '../src/data/glasses.json'
 import { generateSlug } from '../src/lib/utils'
 
-const prisma = new PrismaClient()
-
 async function main() {
+  console.log('🌱 Seeding Firestore database...')
+  
   // Clear existing products (optional, for fresh seed)
-  await prisma.product.deleteMany({})
+  await db.product.deleteMany()
+  console.log('✅ Cleared existing products')
 
   // Create products
+  let count = 0
   for (const product of glassesData.products) {
-    await prisma.product.create({
+    await db.product.create({
       data: {
         name: product.name,
         description: product.description,
-        price: product.price, // Price is already in correct format
+        price: product.price,
         category: product.category,
         brand: product.brand,
         rating: product.rating,
         reviews: product.reviews,
         stock: 100, // Default stock
-        images: [product.image], // Store as JSON array
+        images: [product.image], // Store as array
         badge: product.badge,
-        slug: generateSlug(product.name) // Generate and include slug
+        slug: generateSlug(product.name)
       }
     })
+    count++
   }
+  
+  console.log(`✅ Seeded ${count} products to Firestore`)
+  console.log('🎉 Database seeding completed!')
 }
 
 main()
   .catch(e => {
-    console.error(e)
+    console.error('❌ Seeding error:', e)
     process.exit(1)
   })
-  .finally(async () => {
-    await prisma.$disconnect()
+  .finally(() => {
+    process.exit(0)
   })
+

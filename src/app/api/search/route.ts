@@ -33,13 +33,13 @@ export async function GET(request: NextRequest) {
     const validatedParams = searchSchema.parse(params)
     
     // Use the same product data as the main API
-    let allProducts;
+    let allProducts: any[];
     try {
       const dbProducts = await db.product.findMany();
-      allProducts = dbProducts.map(product => ({
+      allProducts = dbProducts.map((product: any) => ({
         ...product,
         slug: product.slug || generateSlug(product.name),
-        inStock: product.stock > 0,
+        inStock: (product.stock || 0) > 0,
         image: Array.isArray(product.images) && product.images.length > 0 
           ? product.images[0] 
           : null,

@@ -3,11 +3,9 @@
  * Run with: npx tsx scripts/create-admin.ts
  */
 
-import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs'
+import { db } from '../src/lib/db'
+import { hashPassword } from '../src/lib/auth'
 import readline from 'readline'
-
-const prisma = new PrismaClient()
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -29,15 +27,15 @@ async function createAdmin() {
     }
     
     // Check if user already exists
-    const existing = await prisma.user.findUnique({
+    const existing = await db.user.findUnique({
       where: { email },
     })
     
     if (existing) {
       const update = await question(`User ${email} already exists. Update to admin? (y/n): `)
       if (update.toLowerCase() === 'y') {
-        await prisma.user.update({
-          where: { email },
+        await db.user.update({
+          where: { id: existing.id },
           data: { role: 'admin' },
         })
         console.log(`✅ Updated ${email} to admin role`)
@@ -74,10 +72,10 @@ async function createAdmin() {
     }
     
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12)
+    const hashedPassword = await hashPassword(password)
     
     // Create admin user
-    const admin = await prisma.user.create({
+    const admin = await db.user.create({
       data: {
         email,
         name,
@@ -97,7 +95,6 @@ async function createAdmin() {
     process.exit(1)
   } finally {
     rl.close()
-    await prisma.$disconnect()
   }
 }
 

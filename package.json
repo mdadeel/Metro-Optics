@@ -5,21 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "prebuild": "node scripts/check-env.js",
-    "build": "prisma generate && (prisma migrate deploy || echo 'Migration skipped') && next build",
-    "postbuild": "prisma db seed",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "setup": "node scripts/update-env.js",
-    "db:push": "prisma db push",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:reset": "prisma migrate reset",
-    "db:seed": "prisma db seed",
-    "db:setup": "./scripts/setup-database.sh",
+    "db:seed": "tsx scripts/seed-firestore.ts",
     "create-admin": "tsx scripts/create-admin.ts"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -69,6 +60,8 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
+    "firebase": "^12.5.0",
+    "firebase-admin": "^13.5.0",
     "framer-motion": "^12.23.2",
     "input-otp": "^1.4.2",
     "jsonwebtoken": "^9.0.2",

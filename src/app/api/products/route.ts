@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { Product, Prisma } from '@prisma/client';
 import { generateSlug } from '@/lib/utils';
+
+// Product type definition (replaces Prisma types)
+type Product = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  brand?: string | null;
+  rating: number;
+  reviews: number;
+  stock: number;
+  images?: string[] | null;
+  badge?: string | null;
+  slug: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
 
 // Helper function to get sort options
 function getSortOption(sortBy: string | null): { rating: 'desc' } | { reviews: 'desc' } | { price: 'asc' | 'desc' } | { name: 'asc' } {
@@ -32,8 +49,8 @@ export async function GET(request: NextRequest) {
     let products: Product[] = []
     
     try {
-      // Build where clause (excluding search, we'll filter that in memory for SQLite compatibility)
-      const whereClause: Prisma.ProductWhereInput = {
+      // Build where clause for Firestore
+      const whereClause: any = {
         ...(category && { category }),
         ...(brand && { brand }),
         ...(minPrice && { price: { gte: parseFloat(minPrice) } }),
@@ -49,13 +66,13 @@ export async function GET(request: NextRequest) {
         })
       }
 
-      // Fetch products from database
+      // Fetch products from Firestore
       products = await db.product.findMany({ 
         where: whereClause,
         orderBy: getSortOption(sortBy), 
-      })
+      }) as Product[]
 
-      // Apply search filter in memory (SQLite doesn't support case-insensitive contains well)
+      // Apply search filter in memory (case-insensitive search)
       if (search) {
         const searchLower = search.toLowerCase()
         products = products.filter(product => {
@@ -68,7 +85,7 @@ export async function GET(request: NextRequest) {
 
       // Apply limit after filtering
       if (limit) {
-        products = products.slice(0, parseInt(limit))
+        products = products.slice(0, parseInt(limit, 10))
       }
     } catch (dbError) {
       console.error('Database error in products API:', dbError)

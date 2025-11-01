@@ -43,16 +43,11 @@ if (!isVercel && !isCI) {
 }
 
 const requiredVars = {
-  DATABASE_URL: {
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: {
     required: true,
-    description: 'Database connection string',
-    example: {
-      sqlite: 'file:./dev.db',
-      postgres: 'postgresql://user:password@host:5432/database?schema=public'
-    },
-    note: isVercel 
-      ? 'For Vercel, use PostgreSQL (not SQLite). Set this in Vercel Dashboard → Settings → Environment Variables'
-      : 'For Vercel, use PostgreSQL (not SQLite). See VERCEL_DEPLOYMENT_GUIDE.md'
+    description: 'Firebase project ID',
+    example: 'your-project-id',
+    note: 'Get this from Firebase Console → Project Settings'
   },
   JWT_SECRET: {
     required: true, // Required for production builds
@@ -62,11 +57,33 @@ const requiredVars = {
 };
 
 const optionalVars = {
-  ALLOWED_ORIGINS: {
-    description: 'Comma-separated allowed origins for CORS',
-    example: 'http://localhost:3000,https://yourdomain.vercel.app'
+  FIREBASE_SERVICE_ACCOUNT_KEY: {
+    description: 'Firebase service account JSON (for server-side admin operations)',
+    example: '{"type":"service_account","project_id":"..."}',
+    note: 'Optional: Can use Application Default Credentials instead'
+  },
+  NEXT_PUBLIC_FIREBASE_API_KEY: {
+    description: 'Firebase API key (for client-side operations)',
+    example: 'AIzaSy...'
+  },
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: {
+    description: 'Firebase Auth domain',
+    example: 'your-project.firebaseapp.com'
+  },
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: {
+    description: 'Firebase Storage bucket',
+    example: 'your-project.appspot.com'
+  },
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: {
+    description: 'Firebase Messaging sender ID',
+    example: '123456789'
+  },
+  NEXT_PUBLIC_FIREBASE_APP_ID: {
+    description: 'Firebase App ID',
+    example: '1:123456789:web:abcdef'
   }
 };
+
 
 function checkEnvironmentVariables() {
   const missing = [];

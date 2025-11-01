@@ -36,41 +36,76 @@ async function main() {
     console.log('📝 Using .env.example as template\n');
   }
 
-  // Get DATABASE_URL
-  console.log('📊 Database Configuration');
-  console.log('Get your connection string from: Supabase Dashboard → Settings → Database → Connection string\n');
-  console.log('⚠️  IMPORTANT: Must start with postgresql:// or postgres://\n');
+  // Get Firebase Configuration
+  console.log('🔥 Firebase Configuration');
+  console.log('Get your Firebase config from: Firebase Console → Project Settings → General → Your apps\n');
   
-  const dbUrl = await question('Enter DATABASE_URL (Supabase PostgreSQL connection string): ');
-  if (!dbUrl || !dbUrl.trim()) {
-    console.error('❌ DATABASE_URL is required');
+  const projectId = await question('Enter NEXT_PUBLIC_FIREBASE_PROJECT_ID: ');
+  if (!projectId || !projectId.trim()) {
+    console.error('❌ NEXT_PUBLIC_FIREBASE_PROJECT_ID is required');
     process.exit(1);
-  }
-  
-  // Validate connection string format
-  const trimmedUrl = dbUrl.trim();
-  if (!trimmedUrl.startsWith('postgresql://') && !trimmedUrl.startsWith('postgres://')) {
-    console.error('\n❌ ERROR: DATABASE_URL must start with postgresql:// or postgres://');
-    console.error('   You entered:', trimmedUrl);
-    console.error('\n   Example format:');
-    console.error('   postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres');
-    console.error('\n   Get the correct string from: Supabase Dashboard → Settings → Database → Connection string → URI\n');
-    process.exit(1);
-  }
-  
-  // Add SSL mode if not present (required for Supabase)
-  let finalUrl = trimmedUrl;
-  if (!finalUrl.includes('sslmode=') && !finalUrl.includes('?')) {
-    finalUrl = finalUrl + '?sslmode=require';
-  } else if (!finalUrl.includes('sslmode=') && finalUrl.includes('?')) {
-    finalUrl = finalUrl + '&sslmode=require';
   }
 
-  // Update or add DATABASE_URL
-  if (envContent.includes('DATABASE_URL=')) {
-    envContent = envContent.replace(/DATABASE_URL=.*/g, `DATABASE_URL="${dbUrl.trim()}"`);
+  // Update or add Firebase Project ID
+  if (envContent.includes('NEXT_PUBLIC_FIREBASE_PROJECT_ID=')) {
+    envContent = envContent.replace(/NEXT_PUBLIC_FIREBASE_PROJECT_ID=.*/g, `NEXT_PUBLIC_FIREBASE_PROJECT_ID="${projectId.trim()}"`);
   } else {
-    envContent += `\nDATABASE_URL="${dbUrl.trim()}"\n`;
+    envContent += `\nNEXT_PUBLIC_FIREBASE_PROJECT_ID="${projectId.trim()}"\n`;
+  }
+  
+  // Optional Firebase config
+  const addFirebaseConfig = await question('\nAdd full Firebase client config? (y/n): ');
+  if (addFirebaseConfig.toLowerCase() === 'y') {
+    const apiKey = await question('NEXT_PUBLIC_FIREBASE_API_KEY: ');
+    const authDomain = await question('NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ');
+    const storageBucket = await question('NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ');
+    const messagingSenderId = await question('NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ');
+    const appId = await question('NEXT_PUBLIC_FIREBASE_APP_ID: ');
+    
+    const firebaseVars = {
+      'NEXT_PUBLIC_FIREBASE_API_KEY': apiKey.trim(),
+      'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN': authDomain.trim(),
+      'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET': storageBucket.trim(),
+      'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID': messagingSenderId.trim(),
+      'NEXT_PUBLIC_FIREBASE_APP_ID': appId.trim(),
+    };
+    
+    for (const [key, value] of Object.entries(firebaseVars)) {
+      if (value) {
+        if (envContent.includes(`${key}=`)) {
+          envContent = envContent.replace(new RegExp(`${key}=.*`, 'g'), `${key}="${value}"`);
+        } else {
+          envContent += `${key}="${value}"\n`;
+        }
+      }
+    }
+  }
+  
+  // Service Account Key (optional)
+  const addServiceAccount = await question('\nAdd Firebase Service Account Key? (y/n): ');
+  if (addServiceAccount.toLowerCase() === 'y') {
+    console.log('\n⚠️  Paste the entire service account JSON. Press Enter when done, then Ctrl+D (or Ctrl+Z on Windows):');
+    let serviceAccountJson = '';
+    for await (const line of readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    })) {
+      serviceAccountJson += line + '\n';
+    }
+    
+    if (serviceAccountJson.trim()) {
+      try {
+        // Validate JSON
+        JSON.parse(serviceAccountJson);
+        if (envContent.includes('FIREBASE_SERVICE_ACCOUNT_KEY=')) {
+          envContent = envContent.replace(/FIREBASE_SERVICE_ACCOUNT_KEY=.*/g, `FIREBASE_SERVICE_ACCOUNT_KEY='${serviceAccountJson.trim().replace(/'/g, "\\'")}'`);
+        } else {
+          envContent += `FIREBASE_SERVICE_ACCOUNT_KEY='${serviceAccountJson.trim().replace(/'/g, "\\'")}'\n`;
+        }
+      } catch (e) {
+        console.error('❌ Invalid JSON. Service account key not added.');
+      }
+    }
   }
 
   // Get JWT_SECRET
@@ -92,20 +127,6 @@ async function main() {
     }
   }
 
-  // Add Supabase URL and key (optional)
-  if (!envContent.includes('NEXT_PUBLIC_SUPABASE_URL')) {
-    const addSupabase = await question('\nAdd Supabase client keys? (y/n): ');
-    if (addSupabase.toLowerCase() === 'y') {
-      const supabaseUrl = await question('NEXT_PUBLIC_SUPABASE_URL (https://vxaoggvubqzlmogkzsvc.supabase.co): ');
-      const supabaseKey = await question('NEXT_PUBLIC_SUPABASE_ANON_KEY: ');
-      if (supabaseUrl.trim()) {
-        envContent += `NEXT_PUBLIC_SUPABASE_URL="${supabaseUrl.trim()}"\n`;
-      }
-      if (supabaseKey.trim()) {
-        envContent += `NEXT_PUBLIC_SUPABASE_ANON_KEY="${supabaseKey.trim()}"\n`;
-      }
-    }
-  }
 
   // Write .env.local
   fs.writeFileSync(envPath, envContent.trim() + '\n', 'utf-8');
@@ -115,20 +136,20 @@ async function main() {
   console.log('\n🚀 Vercel Deployment');
   const setupVercel = await question('Do you want instructions for setting up Vercel? (y/n): ');
   if (setupVercel.toLowerCase() === 'y') {
-    console.log('\n📝 To set DATABASE_URL in Vercel:');
+    console.log('\n📝 To set Firebase config in Vercel:');
     console.log('   1. Go to: Vercel Dashboard → Your Project → Settings → Environment Variables');
-    console.log('   2. Add: DATABASE_URL = ' + dbUrl.trim());
-    console.log('   3. Select: Production, Preview, Development');
-    console.log('   4. Save');
+    console.log(`   2. Add: NEXT_PUBLIC_FIREBASE_PROJECT_ID = ${projectId.trim()}`);
+    console.log('   3. Add other Firebase variables if needed');
+    console.log('   4. Select: Production, Preview, Development');
+    console.log('   5. Save');
   }
 
   rl.close();
 
   console.log('\n✅ Setup complete!');
   console.log('\nNext steps:');
-  console.log('  1. Run: npm run db:generate');
-  console.log('  2. Run: npm run db:push');
-  console.log('  3. Run: npm run db:seed (optional)');
+  console.log('  1. Run: npm run db:seed (to seed products)');
+  console.log('  2. Run: npm run create-admin (to create admin user)');
   console.log('');
 }
 
