@@ -16,9 +16,17 @@ function loadEnvFiles() {
     if (fs.existsSync(envPath)) {
       const content = fs.readFileSync(envPath, 'utf-8');
       content.split('\n').forEach(line => {
-        const match = line.match(/^([^=:#]+)=(.*)$/);
+        // Skip comments and empty lines
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) return;
+        
+        // Match key=value pattern (handles quoted and unquoted values)
+        const match = trimmed.match(/^([^=#\s]+)\s*=\s*(.+)$/);
         if (match && !process.env[match[1].trim()]) {
-          process.env[match[1].trim()] = match[2].trim().replace(/^["']|["']$/g, '');
+          let value = match[2].trim();
+          // Remove surrounding quotes (single or double)
+          value = value.replace(/^["']|["']$/g, '');
+          process.env[match[1].trim()] = value;
         }
       });
     }
