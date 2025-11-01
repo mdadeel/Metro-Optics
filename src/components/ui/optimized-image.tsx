@@ -61,11 +61,13 @@ export default function OptimizedImage({
 
   const defaultBlurDataURL = blurDataURL || generateBlurDataURL(width, height)
 
+  const [imgSrc, setImgSrc] = useState(src)
+
   return (
     <div ref={imgRef} className={`relative overflow-hidden ${className}`}>
       {isInView ? (
         <Image
-          src={src}
+          src={imgSrc || '/placeholder-product.jpg'}
           alt={alt}
           width={width}
           height={height}
@@ -73,6 +75,10 @@ export default function OptimizedImage({
             isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           onLoad={() => setIsLoaded(true)}
+          onError={() => {
+            setImgSrc('/placeholder-product.jpg')
+            setIsLoaded(true)
+          }}
           priority={priority}
           placeholder={placeholder}
           blurDataURL={defaultBlurDataURL}

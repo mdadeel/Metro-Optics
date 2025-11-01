@@ -340,13 +340,18 @@ export default function ProductDetail() {
 
   const isFavorited = favorites.some(fav => fav.id === product.id);
 
-  // Generate mock images and specifications for demo
-  const productImages = [
-    product.image,
-    `https://images.unsplash.com/photo-${1500000000000 + product.id}?w=600&h=600&fit=crop`,
-    `https://images.unsplash.com/photo-${1500000000001 + product.id}?w=600&h=600&fit=crop`,
-    `https://images.unsplash.com/photo-${1500000000002 + product.id}?w=600&h=600&fit=crop`
-  ];
+  // Generate product images with fallback handling
+  const productData = product as typeof product & { images?: string[] | null }
+  const productImages = (productData?.images && Array.isArray(productData.images) && productData.images.length > 0)
+    ? productData.images.filter((img): img is string => typeof img === 'string' && img.length > 0)
+    : product?.image
+    ? [product.image]
+    : ['/placeholder-product.jpg']; // Fallback image
+
+  // Ensure we always have at least one image
+  if (productImages.length === 0) {
+    productImages.push('/placeholder-product.jpg')
+  }
   
   const productFeatures = product.features || [
     'Polarized Lenses',
@@ -423,14 +428,21 @@ export default function ProductDetail() {
                 <div className="absolute inset-0 bg-gray-200 animate-pulse" />
               )}
               <Image
-                src={productImages[selectedImage]}
-                alt={product.name}
+                src={productImages[selectedImage] || productImages[0]}
+                alt={product?.name || 'Product image'}
                 width={600}
                 height={600}
                 className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 cursor-zoom-in ${
                   imageLoading ? 'opacity-0' : 'opacity-100'
                 }`}
                 onLoad={() => setImageLoading(false)}
+                onError={() => {
+                  setImageLoading(false)
+                  // Fallback to placeholder if image fails
+                  if (productImages[selectedImage] !== '/placeholder-product.jpg') {
+                    productImages[selectedImage] = '/placeholder-product.jpg'
+                  }
+                }}
                 onClick={() => setIsZoomed(!isZoomed)}
               />
               <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -467,11 +479,18 @@ export default function ProductDetail() {
                   }`}
                 >
                   <Image
-                    src={image}
-                    alt={`${product.name} ${index + 1}`}
+                    src={image || '/placeholder-product.jpg'}
+                    alt={`${product?.name || 'Product'} ${index + 1}`}
                     width={150}
                     height={150}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                    onError={(e) => {
+                      // Fallback to placeholder on error
+                      const target = e.target as HTMLImageElement
+                      if (target.src !== '/placeholder-product.jpg') {
+                        target.src = '/placeholder-product.jpg'
+                      }
+                    }}
                   />
                 </button>
               ))}
@@ -839,8 +858,8 @@ export default function ProductDetail() {
           onClick={() => setIsZoomed(false)}
         >
           <Image
-            src={productImages[selectedImage]}
-            alt={product.name}
+            src={productImages[selectedImage] || productImages[0] || '/placeholder-product.jpg'}
+            alt={product?.name || 'Product image'}
             width={1200}
             height={1200}
             className="max-w-full max-h-full object-contain animate-scale-in-smooth"

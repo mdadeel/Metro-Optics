@@ -47,14 +47,19 @@ const ProductCard = memo(({
         <div className="flex gap-6">
           <div className="relative w-48 h-48 flex-shrink-0 overflow-hidden rounded-2xl bg-gray-100">
             <Image
-              src={product.image}
+              src={product.image || '/placeholder-product.jpg'}
               alt={product.name}
               fill
               className={cn(
                 "object-cover transition-transform duration-700",
                 hovered ? "scale-110" : "scale-100"
               )}
-
+              onError={(e) => {
+                const target = e.target as HTMLImageElement
+                if (target.src !== '/placeholder-product.jpg') {
+                  target.src = '/placeholder-product.jpg'
+                }
+              }}
             />
             
             {product.badge && (
@@ -150,14 +155,19 @@ const ProductCard = memo(({
           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           
           <Image
-            src={product.image}
+            src={product.image || '/placeholder-product.jpg'}
             alt={product.name}
             fill
             className={cn(
               "object-cover transition-transform duration-700",
               hovered ? "scale-110" : "scale-100"
             )}
-
+            onError={(e) => {
+              const target = e.target as HTMLImageElement
+              if (target.src !== '/placeholder-product.jpg') {
+                target.src = '/placeholder-product.jpg'
+              }
+            }}
           />
           
           {/* Badge */}

@@ -62,8 +62,15 @@ const mockReviews = [
   },
 ];
 
-export async function GET(request: NextRequest, { params }: { params: { productId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ productId: string }> | { productId: string } }) {
   try {
+    // Handle Next.js 15 params as Promise
+    const resolvedParams = params instanceof Promise ? await params : params
+    
+    if (!resolvedParams?.productId) {
+      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 })
+    }
+
     const { searchParams } = new URL(request.url);
     const sortBy = searchParams.get('sortBy') || 'newest';
     const rating = searchParams.get('rating');
@@ -73,8 +80,8 @@ export async function GET(request: NextRequest, { params }: { params: { productI
     const product = await db.product.findFirst({
       where: {
         OR: [
-          { slug: params.productId },
-          { id: params.productId }
+          { slug: resolvedParams.productId },
+          { id: resolvedParams.productId }
         ]
       }
     });
@@ -143,8 +150,15 @@ export async function GET(request: NextRequest, { params }: { params: { productI
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { productId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ productId: string }> | { productId: string } }) {
   try {
+    // Handle Next.js 15 params as Promise
+    const resolvedParams = params instanceof Promise ? await params : params
+    
+    if (!resolvedParams?.productId) {
+      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 })
+    }
+
     // Check authentication
     const authToken = request.cookies.get('auth-token')?.value
     if (!authToken) {
@@ -186,8 +200,8 @@ export async function POST(request: NextRequest, { params }: { params: { product
     const product = await db.product.findFirst({
       where: {
         OR: [
-          { slug: params.productId },
-          { id: params.productId }
+          { slug: resolvedParams.productId },
+          { id: resolvedParams.productId }
         ]
       }
     });
