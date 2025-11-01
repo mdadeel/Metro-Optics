@@ -39,11 +39,31 @@ async function main() {
   // Get DATABASE_URL
   console.log('📊 Database Configuration');
   console.log('Get your connection string from: Supabase Dashboard → Settings → Database → Connection string\n');
+  console.log('⚠️  IMPORTANT: Must start with postgresql:// or postgres://\n');
   
   const dbUrl = await question('Enter DATABASE_URL (Supabase PostgreSQL connection string): ');
   if (!dbUrl || !dbUrl.trim()) {
     console.error('❌ DATABASE_URL is required');
     process.exit(1);
+  }
+  
+  // Validate connection string format
+  const trimmedUrl = dbUrl.trim();
+  if (!trimmedUrl.startsWith('postgresql://') && !trimmedUrl.startsWith('postgres://')) {
+    console.error('\n❌ ERROR: DATABASE_URL must start with postgresql:// or postgres://');
+    console.error('   You entered:', trimmedUrl);
+    console.error('\n   Example format:');
+    console.error('   postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres');
+    console.error('\n   Get the correct string from: Supabase Dashboard → Settings → Database → Connection string → URI\n');
+    process.exit(1);
+  }
+  
+  // Add SSL mode if not present (required for Supabase)
+  let finalUrl = trimmedUrl;
+  if (!finalUrl.includes('sslmode=') && !finalUrl.includes('?')) {
+    finalUrl = finalUrl + '?sslmode=require';
+  } else if (!finalUrl.includes('sslmode=') && finalUrl.includes('?')) {
+    finalUrl = finalUrl + '&sslmode=require';
   }
 
   // Update or add DATABASE_URL
