@@ -1,32 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { comparePassword, generateToken } from '@/lib/auth'
-
-// Mock user database with hashed passwords - in production, this would be a real database
-const users = [
-  {
-    id: 1,
-    name: 'Rahman Ahmed',
-    email: 'rahman.ahmed@email.com',
-    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj6ukx.LFvO.', // hashed 'password123'
-    phone: '+880 1712-345678',
-    avatar: '/api/placeholder/100/100',
-    memberSince: 'January 2023',
-    totalOrders: 24,
-    totalSpent: 125990,
-  },
-  {
-    id: 2,
-    name: 'Fatima Khan',
-    email: 'fatima.khan@email.com',
-    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj6ukx.LFvO.', // hashed 'password123'
-    phone: '+880 1812-987654',
-    avatar: '/api/placeholder/100/100',
-    memberSince: 'March 2023',
-    totalOrders: 15,
-    totalSpent: 89750,
-  }
-]
+import { db } from '@/lib/db'
+import { rateLimit, getClientIP } from '@/lib/ratelimit'
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -35,13 +11,38 @@ const loginSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 5 attempts per 15 minutes per IP
+    const ip = getClientIP(request)
+    const rateLimitResult = rateLimit(`login:${ip}`, 5, 15 * 60 * 1000) // 5 attempts per 15 minutes
+    
+    if (!rateLimitResult.success) {
+      const retryAfter = Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+      return NextResponse.json(
+        {
+          error: 'Too many login attempts. Please try again later.',
+          retryAfter,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': retryAfter.toString(),
+            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': new Date(rateLimitResult.reset).toISOString(),
+          },
+        }
+      )
+    }
+    
     const body = await request.json()
     
     // Validate input
     const validatedData = loginSchema.parse(body)
     
-    // Find user by email
-    const user = users.find(u => u.email === validatedData.email)
+    // Find user by email in database
+    const user = await db.user.findUnique({
+      where: { email: validatedData.email },
+    })
     
     if (!user) {
       return NextResponse.json(
@@ -59,16 +60,14 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Create user session with JWT
+    // Create user session with JWT (don't include password)
     const userSession = {
       id: user.id,
-      name: user.name,
+      name: user.name || '',
       email: user.email,
-      phone: user.phone,
-      avatar: user.avatar,
-      memberSince: user.memberSince,
-      totalOrders: user.totalOrders,
-      totalSpent: user.totalSpent,
+      role: user.role,
+      phone: user.phone || undefined,
+      avatar: user.avatar || undefined,
     }
     
     // Generate JWT token

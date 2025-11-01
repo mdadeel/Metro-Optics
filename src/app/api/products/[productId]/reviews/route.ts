@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { verifyToken } from '@/lib/auth';
+import { sanitizeInput, sanitizeHtml, sanitizeUsername } from '@/lib/sanitize';
 
 // Mock reviews data stored in memory (in a real application, this would come from a database)
 const mockReviews = [
@@ -143,20 +145,39 @@ export async function GET(request: NextRequest, { params }: { params: { productI
 
 export async function POST(request: NextRequest, { params }: { params: { productId: string } }) {
   try {
+    // Check authentication
+    const authToken = request.cookies.get('auth-token')?.value
+    if (!authToken) {
+      return NextResponse.json(
+        { error: 'Authentication required to submit reviews' },
+        { status: 401 }
+      )
+    }
+    
+    // Verify token and get user
+    const userSession = verifyToken(authToken)
+    if (!userSession || !userSession.id) {
+      return NextResponse.json(
+        { error: 'Invalid or expired authentication token' },
+        { status: 401 }
+      )
+    }
+    
     const body = await request.json();
     
     // Validate required fields
-    if (!body.userId || !body.userName || !body.rating || !body.comment) {
+    if (!body.rating || !body.comment) {
       return NextResponse.json(
-        { error: 'Missing required fields: userId, userName, rating, comment' },
+        { error: 'Missing required fields: rating, comment' },
         { status: 400 }
       );
     }
     
     // Validate rating range
-    if (body.rating < 1 || body.rating > 5) {
+    const rating = Number(body.rating)
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
       return NextResponse.json(
-        { error: 'Rating must be between 1 and 5' },
+        { error: 'Rating must be an integer between 1 and 5' },
         { status: 400 }
       );
     }
@@ -175,15 +196,26 @@ export async function POST(request: NextRequest, { params }: { params: { product
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
     
-    // Create new review
+    // Get user from database for name
+    const user = await db.user.findUnique({
+      where: { id: userSession.id as string },
+      select: { name: true }
+    })
+    
+    // Sanitize all user inputs
+    const sanitizedComment = sanitizeHtml(body.comment)
+    const sanitizedTitle = body.title ? sanitizeInput(body.title) : `Review for ${product.name}`
+    const userName = user?.name || sanitizeUsername(userSession.name || 'Anonymous')
+    
+    // Create new review with sanitized data
     const newReview = {
       id: mockReviews.length + 1,
       productId: product.id,
-      userId: body.userId,
-      userName: body.userName,
-      rating: body.rating,
-      title: body.title || `Review for ${product.name}`,
-      comment: body.comment,
+      userId: userSession.id,
+      userName: userName,
+      rating: rating,
+      title: sanitizedTitle,
+      comment: sanitizedComment,
       date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
       verified: false // In a real app, this would be determined by purchase verification
     };

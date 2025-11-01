@@ -1,49 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { hashPassword, generateToken } from '@/lib/auth'
-
-// Mock user database with hashed passwords - in production, this would be a real database
-const users = [
-  {
-    id: 1,
-    name: 'Rahman Ahmed',
-    email: 'rahman.ahmed@email.com',
-    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj6ukx.LFvO.', // hashed 'password123'
-    phone: '+880 1712-345678',
-    avatar: '/api/placeholder/100/100',
-    memberSince: 'January 2023',
-    totalOrders: 24,
-    totalSpent: 125990,
-  },
-  {
-    id: 2,
-    name: 'Fatima Khan',
-    email: 'fatima.khan@email.com',
-    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj6ukx.LFvO.', // hashed 'password123'
-    phone: '+880 1812-987654',
-    avatar: '/api/placeholder/100/100',
-    memberSince: 'March 2023',
-    totalOrders: 15,
-    totalSpent: 89750,
-  }
-]
+import { db } from '@/lib/db'
+import { rateLimit, getClientIP } from '@/lib/ratelimit'
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  phone: z.string().min(10, 'Phone number must be at least 10 characters'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+  phone: z.string().min(10, 'Phone number must be at least 10 characters').optional(),
 })
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 3 registrations per hour per IP
+    const ip = getClientIP(request)
+    const rateLimitResult = rateLimit(`register:${ip}`, 3, 60 * 60 * 1000) // 3 attempts per hour
+    
+    if (!rateLimitResult.success) {
+      const retryAfter = Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+      return NextResponse.json(
+        {
+          error: 'Too many registration attempts. Please try again later.',
+          retryAfter,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': retryAfter.toString(),
+            'X-RateLimit-Limit': '3',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': new Date(rateLimitResult.reset).toISOString(),
+          },
+        }
+      )
+    }
+    
     const body = await request.json()
     
     // Validate input
     const validatedData = registerSchema.parse(body)
     
-    // Check if user already exists
-    const existingUser = users.find(u => u.email === validatedData.email)
+    // Check if user already exists in database
+    const existingUser = await db.user.findUnique({
+      where: { email: validatedData.email },
+    })
+    
     if (existingUser) {
       return NextResponse.json(
         { error: 'User with this email already exists' },
@@ -51,32 +59,26 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Create new user with hashed password
+    // Create new user with hashed password in database
     const hashedPassword = await hashPassword(validatedData.password)
-    const newUser = {
-      id: users.length + 1,
-      name: validatedData.name,
-      email: validatedData.email,
-      password: hashedPassword,
-      phone: validatedData.phone,
-      avatar: '/api/placeholder/100/100',
-      memberSince: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-      totalOrders: 0,
-      totalSpent: 0,
-    }
+    const newUser = await db.user.create({
+      data: {
+        name: validatedData.name,
+        email: validatedData.email,
+        password: hashedPassword,
+        phone: validatedData.phone,
+        role: 'user',
+      },
+    })
     
-    users.push(newUser)
-    
-    // Create user session
+    // Create user session (don't include password)
     const userSession = {
       id: newUser.id,
       name: newUser.name,
       email: newUser.email,
-      phone: newUser.phone,
-      avatar: newUser.avatar,
-      memberSince: newUser.memberSince,
-      totalOrders: newUser.totalOrders,
-      totalSpent: newUser.totalSpent,
+      role: newUser.role,
+      phone: newUser.phone || undefined,
+      avatar: newUser.avatar || undefined,
     }
     
     // Generate JWT token

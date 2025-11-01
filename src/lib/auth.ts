@@ -1,10 +1,34 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-for-development';
-if (!process.env.JWT_SECRET) {
-  console.warn('JWT_SECRET environment variable is not defined, using fallback key');
-  console.info('For production, please set JWT_SECRET in your environment variables');
+// CRITICAL: Fail fast if JWT_SECRET is not set in production
+const JWT_SECRET = process.env.JWT_SECRET
+
+if (!JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'JWT_SECRET environment variable is required in production. ' +
+      'Please set it in your environment variables.'
+    )
+  }
+  console.warn('⚠️  JWT_SECRET not set - using development fallback (INSECURE)')
+  console.warn('⚠️  This should NEVER be used in production!')
+}
+
+// Validate secret strength if set
+if (JWT_SECRET && JWT_SECRET.length < 32) {
+  console.warn('⚠️  JWT_SECRET is too short. Minimum 32 characters recommended for security.')
+}
+
+const getSecret = (): string => {
+  if (!JWT_SECRET) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET is required in production')
+    }
+    // Development fallback - warn but allow
+    return 'development-secret-key-do-not-use-in-production-minimum-32-characters'
+  }
+  return JWT_SECRET
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -29,12 +53,12 @@ type UserSession = {
 };
 
 export function generateToken(payload: UserSession): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' })
+  return jwt.sign(payload, getSecret(), { expiresIn: '7d' })
 }
 
 export function verifyToken(token: string): UserSession | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as UserSession
+    return jwt.verify(token, getSecret()) as UserSession
   } catch {
     return null
   }

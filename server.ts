@@ -31,12 +31,14 @@ async function createCustomServer() {
       handle(req, res);
     });
 
-    // Setup Socket.IO
+    // Setup Socket.IO with secure CORS
+    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000']
     const io = new Server(server, {
       path: '/api/socketio',
       cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
+        origin: dev ? '*' : allowedOrigins, // In development, allow all; in production, restrict
+        methods: ["GET", "POST"],
+        credentials: true
       }
     });
 
