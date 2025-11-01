@@ -5,6 +5,29 @@
  * Provides helpful error messages if variables are missing
  */
 
+const fs = require('fs');
+const path = require('path');
+
+// Load .env.local and .env files if they exist
+function loadEnvFiles() {
+  const envFiles = ['.env.local', '.env'];
+  for (const file of envFiles) {
+    const envPath = path.join(process.cwd(), file);
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf-8');
+      content.split('\n').forEach(line => {
+        const match = line.match(/^([^=:#]+)=(.*)$/);
+        if (match && !process.env[match[1].trim()]) {
+          process.env[match[1].trim()] = match[2].trim().replace(/^["']|["']$/g, '');
+        }
+      });
+    }
+  }
+}
+
+// Load environment files
+loadEnvFiles();
+
 const requiredVars = {
   DATABASE_URL: {
     required: true,
