@@ -53,14 +53,15 @@ const requiredVars = {
     note: isVercel 
       ? 'For Vercel, use PostgreSQL (not SQLite). Set this in Vercel Dashboard → Settings → Environment Variables'
       : 'For Vercel, use PostgreSQL (not SQLite). See VERCEL_DEPLOYMENT_GUIDE.md'
+  },
+  JWT_SECRET: {
+    required: true, // Required for production builds
+    description: 'JWT secret for authentication (min 32 chars, required)',
+    example: 'your-secret-key-minimum-32-characters-long'
   }
 };
 
 const optionalVars = {
-  JWT_SECRET: {
-    description: 'JWT secret for authentication (min 32 chars)',
-    example: 'your-secret-key-minimum-32-characters-long'
-  },
   ALLOWED_ORIGINS: {
     description: 'Comma-separated allowed origins for CORS',
     example: 'http://localhost:3000,https://yourdomain.vercel.app'
