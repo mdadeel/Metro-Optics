@@ -33,8 +33,14 @@ function loadEnvFiles() {
   }
 }
 
-// Load environment files
-loadEnvFiles();
+// Check if we're on Vercel or CI (where .env files won't exist)
+const isVercel = !!process.env.VERCEL;
+const isCI = !!process.env.CI;
+
+// Only load local env files if not on Vercel/CI
+if (!isVercel && !isCI) {
+  loadEnvFiles();
+}
 
 const requiredVars = {
   DATABASE_URL: {
@@ -44,7 +50,9 @@ const requiredVars = {
       sqlite: 'file:./dev.db',
       postgres: 'postgresql://user:password@host:5432/database?schema=public'
     },
-    note: 'For Vercel, use PostgreSQL (not SQLite). See VERCEL_DEPLOYMENT_GUIDE.md'
+    note: isVercel 
+      ? 'For Vercel, use PostgreSQL (not SQLite). Set this in Vercel Dashboard → Settings → Environment Variables'
+      : 'For Vercel, use PostgreSQL (not SQLite). See VERCEL_DEPLOYMENT_GUIDE.md'
   }
 };
 
@@ -100,9 +108,17 @@ function checkEnvironmentVariables() {
     });
 
     console.error('\n📝 To fix:');
-    console.error('  1. For local development: Create .env.local file');
-    console.error('  2. For Vercel: Go to Settings → Environment Variables');
-    console.error('  3. See VERCEL_DEPLOYMENT_GUIDE.md for detailed instructions\n');
+    if (isVercel) {
+      console.error('  This is a Vercel build. Set DATABASE_URL in:');
+      console.error('  Vercel Dashboard → Your Project → Settings → Environment Variables');
+      console.error('  Add: DATABASE_URL = postgresql://... (PostgreSQL connection string)');
+      console.error('  Make sure to select the correct environment (Production/Preview/Development)');
+    } else {
+      console.error('  1. For local development: Create .env.local file with DATABASE_URL');
+      console.error('  2. For Vercel: Go to Settings → Environment Variables');
+      console.error('  3. See VERCEL_DEPLOYMENT_GUIDE.md for detailed instructions');
+    }
+    console.error('');
 
     process.exit(1);
   }
