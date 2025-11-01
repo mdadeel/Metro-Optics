@@ -20,7 +20,11 @@ function initializeFirebaseAdmin() {
 
   // Get Firebase credentials from environment
   const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'metro-optics'
+  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  
+  if (!projectId) {
+    throw new Error('NEXT_PUBLIC_FIREBASE_PROJECT_ID environment variable is required')
+  }
 
   if (!serviceAccount) {
     // For local development and Vercel, use Application Default Credentials
@@ -64,9 +68,10 @@ function initializeFirebaseAdmin() {
     }
   }
 
-  // Fallback to default credentials
+  // Fallback: initialize with project ID only
+  // This works if Application Default Credentials are configured
   firebaseAdminApp = initializeApp({
-    projectId: projectId || 'metro-optics',
+    projectId: projectId,
   })
   db = getFirestore(firebaseAdminApp)
   return firebaseAdminApp
