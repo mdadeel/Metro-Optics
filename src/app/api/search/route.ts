@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
-
-function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-}
+import { generateSlug } from '@/lib/utils'
 
 const searchSchema = z.object({
   query: z.string().min(1, 'Search query is required'),
@@ -42,7 +36,6 @@ export async function GET(request: NextRequest) {
     let allProducts;
     try {
       const dbProducts = await db.product.findMany();
-      console.log(`[Search API] Found ${dbProducts.length} products in database`);
       allProducts = dbProducts.map(product => ({
         ...product,
         slug: product.slug || generateSlug(product.name),

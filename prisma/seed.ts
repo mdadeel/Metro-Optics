@@ -1,15 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 import glassesData from '../src/data/glasses.json'
+import { generateSlug } from '../src/lib/utils'
 
 const prisma = new PrismaClient()
-
-// Helper function to generate slug from name
-function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-}
 
 async function main() {
   // Clear existing products (optional, for fresh seed)

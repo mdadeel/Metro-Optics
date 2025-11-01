@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { Product, Prisma } from '@prisma/client';
-
-// Helper function to generate slugs
-function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-}
+import { generateSlug } from '@/lib/utils';
 
 // Helper function to get sort options
 function getSortOption(sortBy: string | null): { rating: 'desc' } | { reviews: 'desc' } | { price: 'asc' | 'desc' } | { name: 'asc' } {
@@ -99,9 +92,6 @@ export async function GET(request: NextRequest) {
         }
       )
     }
-
-    // Log product count for debugging
-    console.log(`[Products API] Found ${products.length} products`)
 
     // Transform products to include a single image field and slug for frontend compatibility
     const transformedProducts = products.map(product => ({

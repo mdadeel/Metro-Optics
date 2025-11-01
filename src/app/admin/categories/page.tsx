@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { generateSlug } from "@/lib/utils"
 import { AdminProvider } from "@/lib/admin-context"
 import { AdminProtection } from "@/components/admin/admin-protection"
 import { AdminLayout } from "@/components/admin/admin-layout"
@@ -118,10 +119,6 @@ function CategoriesManagementContent() {
       status: category?.status || "active",
       featured: category?.featured || false
     })
-
-    const generateSlug = (name: string) => {
-      return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-    }
 
     const handleNameChange = (name: string) => {
       setFormData({

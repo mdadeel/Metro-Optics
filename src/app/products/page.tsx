@@ -93,7 +93,6 @@ export default function ProductsPage() {
         }
         
         const productCount = Array.isArray(data) ? data.length : (data.products?.length || 0)
-        console.log(`[Products Page] Received ${productCount} products`)
         setTotalPages(Math.ceil(productCount / 12))
       } catch (error) {
         console.error('Failed to fetch products:', error)

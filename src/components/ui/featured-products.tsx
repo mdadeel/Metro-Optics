@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useProducts } from '@/hooks/use-products'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -14,6 +15,7 @@ import { LoadingSkeleton, ErrorBoundary, EmptyState } from '@/components/ui/data
 import type { Product } from '@/types/product'
 
 export default function FeaturedProducts() {
+  const router = useRouter()
   const [activeCategory, setActiveCategory] = useState('all')
   const { addToCart } = useCart()
   const { addToFavorites, removeFromFavorites, favorites } = useFavorites()
@@ -103,7 +105,7 @@ export default function FeaturedProducts() {
               }
               action={{
                 label: "Refresh Page",
-                onClick: () => window.location.reload()
+                onClick: () => router.refresh()
               }}
             />
           </ErrorBoundary>
@@ -128,7 +130,7 @@ export default function FeaturedProducts() {
               <li>• DATABASE_URL environment variable is set correctly</li>
             </ul>
             <Button 
-              onClick={() => window.location.reload()}
+              onClick={() => router.refresh()}
               variant="outline"
             >
               Refresh Page
